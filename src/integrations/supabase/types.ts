@@ -14,7 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      convidados: {
+        Row: {
+          confirmado: boolean
+          created_at: string
+          familia_id: string
+          id: string
+          nome: string
+          observacao: string | null
+        }
+        Insert: {
+          confirmado?: boolean
+          created_at?: string
+          familia_id: string
+          id?: string
+          nome: string
+          observacao?: string | null
+        }
+        Update: {
+          confirmado?: boolean
+          created_at?: string
+          familia_id?: string
+          id?: string
+          nome?: string
+          observacao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convidados_familia_id_fkey"
+            columns: ["familia_id"]
+            isOneToOne: false
+            referencedRelation: "familias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      familias: {
+        Row: {
+          created_at: string
+          id: string
+          nome_lider: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome_lider: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome_lider?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
