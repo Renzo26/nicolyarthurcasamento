@@ -80,10 +80,40 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(12px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in-slow": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "scale-in": {
+          "0%": { opacity: "0", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "envelope-open": {
+          "0%": { transform: "rotateX(0deg)" },
+          "100%": { transform: "rotateX(-180deg)" },
+        },
+        "letter-rise": {
+          "0%": { transform: "translateY(0) scale(1)", opacity: "1" },
+          "100%": { transform: "translateY(-30px) scale(1.05)", opacity: "1" },
+        },
+        "shimmer": {
+          "0%, 100%": { opacity: "0.6" },
+          "50%": { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.8s ease-out forwards",
+        "fade-in-slow": "fade-in-slow 1.4s ease-out forwards",
+        "scale-in": "scale-in 0.6s ease-out forwards",
+        "envelope-open": "envelope-open 0.9s ease-out forwards",
+        "letter-rise": "letter-rise 0.8s ease-out forwards",
+        "shimmer": "shimmer 3s ease-in-out infinite",
       },
     },
   },
