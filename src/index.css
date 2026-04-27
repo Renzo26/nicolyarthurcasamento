@@ -176,5 +176,4 @@ All colors MUST be HSL.
   .animate-envelope-fade { animation: envelope-fade 3s ease-in-out forwards; }
   .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
   .animate-petal-fall { animation: petal-fall 12s linear infinite; }
-  }
 }
