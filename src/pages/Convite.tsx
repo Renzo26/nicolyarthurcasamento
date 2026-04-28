@@ -96,21 +96,30 @@ const Convite = () => {
             1 Coríntios 13:4-7
           </p>
 
-          <div className="grid grid-cols-3 gap-3 pt-6">
-            {[casal1, casal4, casal3].map((src, i) => (
-              <div
-                key={i}
-                className="aspect-[3/4] rounded-md overflow-hidden shadow-sm"
-                style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
-              >
-                <img
-                  src={src}
-                  alt={`Arthur e Nicoly ${i + 1}`}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-            ))}
+          {/* Mobile: carrossel horizontal (fotos grandes). Desktop: grid 3 colunas */}
+          <div className="pt-6 -mx-6 sm:mx-0">
+            <div
+              className="flex gap-4 overflow-x-auto px-6 pb-4 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:gap-3 sm:overflow-visible sm:px-0 sm:pb-0"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {[casal1, casal4, casal3].map((src, i) => (
+                <div
+                  key={i}
+                  className="shrink-0 w-[78%] sm:w-auto snap-center aspect-[3/4] rounded-md overflow-hidden shadow-md sm:shadow-sm"
+                  style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
+                >
+                  <img
+                    src={src}
+                    alt={`Arthur e Nicoly ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+            <p className="sm:hidden text-center text-xs opacity-50 font-body mt-1">
+              ← deslize para ver mais →
+            </p>
           </div>
         </div>
       </Section>
