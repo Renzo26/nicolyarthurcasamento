@@ -110,7 +110,7 @@ const RsvpSection = () => {
   return (
     <div className="space-y-8">
       <div className="text-center space-y-3">
-        <p className="font-script text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
+        <p className="font-script text-4xl sm:text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
           Confirme sua presença
         </p>
         <p className="font-body text-sm opacity-70 max-w-md mx-auto">
