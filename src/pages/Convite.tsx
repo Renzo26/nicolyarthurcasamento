@@ -95,15 +95,12 @@ const Convite = () => {
             className="mx-auto h-6 w-6"
             style={{ color: "hsl(var(--wedding-rose))" }}
           />
-          <blockquote className="font-display italic text-2xl sm:text-3xl leading-relaxed">
-            “O amor é paciente, o amor é bondoso.<br />
-            Não inveja, não se vangloria, não se orgulha.<br />
-            Não maltrata, não procura seus interesses,<br />
-            não se ira facilmente, não guarda rancor.<br />
-            O amor não se alegra com a injustiça,<br />
-            mas se alegra com a verdade.<br />
-            Tudo sofre, tudo crê, tudo espera,<br />
-            tudo suporta.”
+          <blockquote className="font-display italic text-lg sm:text-2xl md:text-3xl leading-relaxed max-w-xl mx-auto">
+            “O amor é paciente, o amor é bondoso. Não inveja, não se vangloria,
+            não se orgulha. Não maltrata, não procura seus interesses, não se
+            ira facilmente, não guarda rancor. O amor não se alegra com a
+            injustiça, mas se alegra com a verdade. Tudo sofre, tudo crê, tudo
+            espera, tudo suporta.”
           </blockquote>
           <p
             className="font-body tracking-[0.3em] text-xs uppercase"
@@ -147,7 +144,7 @@ const Convite = () => {
             <p className="font-body text-xs uppercase tracking-[0.3em] opacity-60">
               Save the date
             </p>
-            <p className="font-script text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
+            <p className="font-script text-4xl sm:text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
               Quando & Onde
             </p>
           </div>
