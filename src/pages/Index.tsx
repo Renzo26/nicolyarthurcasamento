@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import { Plus, PartyPopper } from "lucide-react";
 import FamilyCard from "@/components/FamilyCard";
 import GuestManager from "@/components/GuestManager";
-import { Link } from "react-router-dom";
 
 interface FamiliaWithCount {
   id: string;
@@ -97,13 +96,6 @@ const Index = () => {
             Nova família
           </Button>
         </div>
-
-        <Link
-          to="/convite"
-          className="block rounded-lg border border-primary/30 bg-accent/40 px-4 py-3 text-center text-sm text-foreground transition hover:bg-accent"
-        >
-          ✨ Ver site do casamento (/convite)
-        </Link>
 
         {/* List */}
         {isLoading ? (
