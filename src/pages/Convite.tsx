@@ -45,16 +45,16 @@ const Convite = () => {
 
       {/* TELA 1 — Capa após envelope */}
       <Section id="capa">
-        <div className="text-center space-y-6 relative">
-          <p className="font-body text-xs uppercase tracking-[0.4em] opacity-60">
+        <div className="text-center space-y-4 sm:space-y-6 relative">
+          <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.35em] sm:tracking-[0.4em] opacity-60">
             Convite de casamento
           </p>
           <h1
-            className="font-script text-7xl sm:text-8xl leading-none"
+            className="font-script text-6xl sm:text-7xl md:text-8xl leading-[0.95]"
             style={{ color: "hsl(var(--wedding-rose))" }}
           >
             Arthur<br />
-            <span className="font-display italic text-4xl sm:text-5xl opacity-80">&</span>
+            <span className="font-display italic text-3xl sm:text-4xl md:text-5xl opacity-80">&</span>
             <br />
             Nicoly
           </h1>
@@ -62,7 +62,7 @@ const Convite = () => {
             className="mx-auto w-16 h-px"
             style={{ background: "hsl(var(--wedding-gold))" }}
           />
-          <p className="font-display text-lg tracking-[0.2em] uppercase">
+          <p className="font-display text-base sm:text-lg tracking-[0.18em] sm:tracking-[0.2em] uppercase">
             {EVENT.date}
           </p>
 
