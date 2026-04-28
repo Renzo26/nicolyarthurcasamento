@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { MapPin, Navigation, Calendar, Heart, Copy, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import EnvelopeIntro from "@/components/wedding/EnvelopeIntro";
-import ScrollHint from "@/components/wedding/ScrollHint";
 import Section from "@/components/wedding/Section";
 import RsvpSection from "@/components/wedding/RsvpSection";
 import casal1 from "@/assets/casal-1.jpeg";
@@ -11,15 +9,14 @@ import casal2 from "@/assets/casal-2.jpeg";
 import casal3 from "@/assets/casal-3.jpeg";
 import casal4 from "@/assets/casal-4.jpeg";
 
-// TODO: substituir pelos dados reais
 const EVENT = {
-  date: "DD de mês de AAAA",
-  time: "00h00",
-  venueName: "Nome do Local",
-  address: "Rua Exemplo, 123 — Bairro, Cidade — UF",
-  // Coordenadas exemplo — troque depois
-  lat: -23.55052,
-  lng: -46.633308,
+  date: "17 de outubro de 2026",
+  time: "13h00",
+  venueName: "Chácara Lasareff",
+  address: "Estrada Rio Pequeno, 2555 — Vila Lídia, Rio Grande da Serra — SP",
+  // Coordenadas aproximadas (Rio Grande da Serra) — ajuste fino depois se necessário
+  lat: -23.7438,
+  lng: -46.3985,
 };
 
 const PIX = {
@@ -28,11 +25,11 @@ const PIX = {
 };
 
 const Convite = () => {
-  const [introDone, setIntroDone] = useState(false);
-
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${EVENT.lat},${EVENT.lng}`;
-  const wazeUrl = `https://waze.com/ul?ll=${EVENT.lat},${EVENT.lng}&navigate=yes`;
-  const appleUrl = `http://maps.apple.com/?ll=${EVENT.lat},${EVENT.lng}&q=${encodeURIComponent(EVENT.venueName)}`;
+  const fullAddress = `${EVENT.venueName}, ${EVENT.address}`;
+  const encoded = encodeURIComponent(fullAddress);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+  const wazeUrl = `https://waze.com/ul?q=${encoded}&navigate=yes`;
+  const appleUrl = `http://maps.apple.com/?q=${encoded}`;
 
   const copyPix = () => {
     navigator.clipboard.writeText(PIX.key);
@@ -44,8 +41,7 @@ const Convite = () => {
       className="w-full"
       style={{ background: "hsl(var(--wedding-bg))", color: "hsl(var(--wedding-ink))" }}
     >
-      <EnvelopeIntro onComplete={() => setIntroDone(true)} />
-      {introDone && <ScrollHint />}
+      <EnvelopeIntro onComplete={() => {}} />
 
       {/* TELA 1 — Capa após envelope */}
       <Section id="capa">
