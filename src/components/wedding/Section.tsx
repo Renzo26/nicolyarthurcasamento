@@ -23,8 +23,7 @@ const Section = ({ id, children, className = "", noFrame = false }: SectionProps
         <img
           src={floralFrame}
           alt=""
-          className="w-auto h-full max-w-none mix-blend-multiply opacity-25 sm:opacity-30"
-          style={{ maxHeight: "100%" }}
+          className="h-full w-auto max-w-none sm:w-full sm:h-full sm:object-cover mix-blend-multiply opacity-25 sm:opacity-30"
           loading="lazy"
         />
       </div>
