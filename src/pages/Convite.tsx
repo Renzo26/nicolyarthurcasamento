@@ -137,7 +137,7 @@ const Convite = () => {
           </div>
 
           <div
-            className="aspect-[16/9] rounded-lg overflow-hidden shadow-md"
+            className="aspect-[4/5] sm:aspect-[16/9] rounded-lg overflow-hidden shadow-md"
             style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
           >
             <img
