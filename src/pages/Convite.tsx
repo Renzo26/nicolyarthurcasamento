@@ -214,7 +214,7 @@ const Convite = () => {
             className="mx-auto h-7 w-7"
             style={{ color: "hsl(var(--wedding-rose))" }}
           />
-          <p className="font-script text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
+          <p className="font-script text-4xl sm:text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
             Um recadinho
           </p>
           <div className="font-display text-lg leading-relaxed max-w-xl mx-auto space-y-4">
