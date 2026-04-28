@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { MapPin, Navigation, Calendar, Heart, Copy, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,8 +25,6 @@ const PIX = {
 };
 
 const Convite = () => {
-  const [introDone, setIntroDone] = useState(false);
-
   const fullAddress = `${EVENT.venueName}, ${EVENT.address}`;
   const encoded = encodeURIComponent(fullAddress);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
@@ -44,7 +41,7 @@ const Convite = () => {
       className="w-full"
       style={{ background: "hsl(var(--wedding-bg))", color: "hsl(var(--wedding-ink))" }}
     >
-      <EnvelopeIntro onComplete={() => setIntroDone(true)} />
+      <EnvelopeIntro onComplete={() => {}} />
 
       {/* TELA 1 — Capa após envelope */}
       <Section id="capa">
