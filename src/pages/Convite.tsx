@@ -132,8 +132,8 @@ const Convite = () => {
             style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
           >
             <img
-              src={casal4}
-              alt="Arthur e Nicoly no parque"
+              src={casal2}
+              alt="Arthur e Nicoly"
               className="w-full h-full object-cover"
               loading="lazy"
             />
