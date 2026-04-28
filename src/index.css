@@ -38,6 +38,15 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
+    /* Wedding palette */
+    --wedding-bg: 36 38% 95%;
+    --wedding-paper: 34 40% 92%;
+    --wedding-ink: 20 25% 18%;
+    --wedding-muted: 22 12% 42%;
+    --wedding-gold: 32 45% 52%;
+    --wedding-rose: 12 45% 58%;
+    --wedding-sage: 95 12% 45%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -103,3 +112,34 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .font-display { font-family: 'Cormorant Garamond', serif; }
+  .font-script { font-family: 'Italianno', cursive; }
+  .font-body { font-family: 'Inter', sans-serif; }
+}
+
+/* Envelope animation (3s) */
+@keyframes envelope-flap {
+  0%, 30%   { transform: rotateX(0deg); }
+  60%, 100% { transform: rotateX(180deg); }
+}
+@keyframes envelope-letter {
+  0%, 55%   { transform: translateY(0) scale(1); opacity: 0; }
+  60%       { opacity: 1; }
+  85%, 100% { transform: translateY(-130%) scale(1.05); opacity: 1; }
+}
+@keyframes envelope-fade {
+  0%, 90%  { opacity: 1; }
+  100%     { opacity: 0; visibility: hidden; }
+}
+@keyframes scroll-hint {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50%      { transform: translateY(8px); opacity: 1; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.8s ease-out both; }
+.animate-scroll-hint { animation: scroll-hint 1.6s ease-in-out infinite; }
