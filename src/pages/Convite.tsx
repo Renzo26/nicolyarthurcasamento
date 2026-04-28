@@ -48,22 +48,8 @@ const Convite = () => {
       {introDone && <ScrollHint />}
 
       {/* TELA 1 — Capa após envelope */}
-      <Section id="capa" className="!p-0 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={casal3}
-            alt="Arthur e Nicoly"
-            className="w-full h-full object-cover"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, hsl(var(--wedding-bg) / 0.55) 0%, hsl(var(--wedding-bg) / 0.35) 40%, hsl(var(--wedding-bg) / 0.92) 100%)",
-            }}
-          />
-        </div>
-        <div className="relative text-center space-y-6 px-6 py-20">
+      <Section id="capa">
+        <div className="text-center space-y-6">
           <p className="font-body text-xs uppercase tracking-[0.4em] opacity-60">
             Convite de casamento
           </p>
@@ -111,7 +97,7 @@ const Convite = () => {
           </p>
 
           <div className="grid grid-cols-3 gap-3 pt-6">
-            {[casal1, casal2, casal3].map((src, i) => (
+            {[casal1, casal4, casal3].map((src, i) => (
               <div
                 key={i}
                 className="aspect-[3/4] rounded-md overflow-hidden shadow-sm"
