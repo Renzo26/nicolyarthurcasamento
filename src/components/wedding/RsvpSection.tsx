@@ -114,7 +114,7 @@ const RsvpSection = () => {
           Confirme sua presença
         </p>
         <p className="font-body text-sm opacity-70 max-w-md mx-auto">
-          Digite seu nome (ou de alguém da sua família) para encontrar seu convite.
+          Digite o nome do responsável pela família ou de qualquer convidado para encontrar seu convite.
         </p>
       </div>
 
