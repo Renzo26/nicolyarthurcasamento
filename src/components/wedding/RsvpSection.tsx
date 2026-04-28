@@ -31,18 +31,27 @@ const RsvpSection = () => {
     enabled: query.trim().length >= 2,
     queryFn: async () => {
       const term = query.trim();
-      // Find guests by name, then get their families with all members
-      const { data: matches, error } = await supabase
-        .from("convidados")
-        .select("familia_id")
-        .ilike("nome", `%${term}%`);
-      if (error) throw error;
-      const familyIds = Array.from(new Set((matches ?? []).map((m) => m.familia_id)));
+      // Buscar em paralelo: por nome do líder da família e por nome do convidado
+      const [byGuest, byLider] = await Promise.all([
+        supabase.from("convidados").select("familia_id").ilike("nome", `%${term}%`),
+        supabase.from("familias").select("id").ilike("nome_lider", `%${term}%`),
+      ]);
+      if (byGuest.error) throw byGuest.error;
+      if (byLider.error) throw byLider.error;
+
+      const familyIds = Array.from(
+        new Set([
+          ...(byGuest.data ?? []).map((m) => m.familia_id),
+          ...(byLider.data ?? []).map((m) => m.id),
+        ]),
+      );
       if (familyIds.length === 0) return [] as FamiliaResult[];
+
       const { data: famData, error: famErr } = await supabase
         .from("familias")
         .select("id, nome_lider, convidados(id, nome, confirmado, familia_id)")
-        .in("id", familyIds);
+        .in("id", familyIds)
+        .order("nome_lider");
       if (famErr) throw famErr;
       return (famData ?? []) as unknown as FamiliaResult[];
     },
