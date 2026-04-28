@@ -29,9 +29,11 @@ const PIX = {
 const Convite = () => {
   const [introDone, setIntroDone] = useState(false);
 
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${EVENT.lat},${EVENT.lng}`;
-  const wazeUrl = `https://waze.com/ul?ll=${EVENT.lat},${EVENT.lng}&navigate=yes`;
-  const appleUrl = `http://maps.apple.com/?ll=${EVENT.lat},${EVENT.lng}&q=${encodeURIComponent(EVENT.venueName)}`;
+  const fullAddress = `${EVENT.venueName}, ${EVENT.address}`;
+  const encoded = encodeURIComponent(fullAddress);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+  const wazeUrl = `https://waze.com/ul?q=${encoded}&navigate=yes`;
+  const appleUrl = `http://maps.apple.com/?q=${encoded}`;
 
   const copyPix = () => {
     navigator.clipboard.writeText(PIX.key);
