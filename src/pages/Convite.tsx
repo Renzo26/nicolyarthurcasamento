@@ -3,7 +3,6 @@ import { MapPin, Navigation, Calendar, Heart, Copy, AlertCircle } from "lucide-r
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import EnvelopeIntro from "@/components/wedding/EnvelopeIntro";
-import ScrollHint from "@/components/wedding/ScrollHint";
 import Section from "@/components/wedding/Section";
 import RsvpSection from "@/components/wedding/RsvpSection";
 import casal1 from "@/assets/casal-1.jpeg";
@@ -46,7 +45,6 @@ const Convite = () => {
       style={{ background: "hsl(var(--wedding-bg))", color: "hsl(var(--wedding-ink))" }}
     >
       <EnvelopeIntro onComplete={() => setIntroDone(true)} />
-      {introDone && <ScrollHint />}
 
       {/* TELA 1 — Capa após envelope */}
       <Section id="capa">
