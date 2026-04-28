@@ -49,7 +49,7 @@ const Convite = () => {
 
       {/* TELA 1 — Capa após envelope */}
       <Section id="capa">
-        <div className="text-center space-y-6">
+        <div className="text-center space-y-6 relative">
           <p className="font-body text-xs uppercase tracking-[0.4em] opacity-60">
             Convite de casamento
           </p>
@@ -69,6 +69,26 @@ const Convite = () => {
           <p className="font-display text-lg tracking-[0.2em] uppercase">
             {EVENT.date}
           </p>
+
+          {/* Indicador "mouse scroll" decorativo na capa */}
+          <div className="pt-10 flex flex-col items-center gap-2 opacity-80">
+            <span
+              className="flex h-9 w-6 items-start justify-center rounded-full pt-1.5"
+              style={{ border: "2px solid hsl(var(--wedding-rose))" }}
+              aria-hidden="true"
+            >
+              <span
+                className="block h-1.5 w-1 rounded-full animate-mouse-wheel"
+                style={{ background: "hsl(var(--wedding-rose))" }}
+              />
+            </span>
+            <span
+              className="font-display tracking-[0.3em] text-[10px] uppercase"
+              style={{ color: "hsl(var(--wedding-rose))" }}
+            >
+              Deslize para baixo
+            </span>
+          </div>
         </div>
       </Section>
 

@@ -137,9 +137,28 @@ All colors MUST be HSL.
   0%, 100% { transform: translateY(0); opacity: 0.6; }
   50%      { transform: translateY(8px); opacity: 1; }
 }
+@keyframes chevron-cascade {
+  0%   { transform: translateY(-6px); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateY(8px); opacity: 0; }
+}
+@keyframes mouse-wheel {
+  0%   { transform: translateY(0); opacity: 1; }
+  70%  { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 0; }
+}
+@keyframes soft-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--wedding-rose) / 0.45); }
+  50%      { box-shadow: 0 0 0 14px hsl(var(--wedding-rose) / 0); }
+}
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up { animation: fade-up 0.8s ease-out both; }
 .animate-scroll-hint { animation: scroll-hint 1.6s ease-in-out infinite; }
+.animate-soft-pulse { animation: soft-pulse 2s ease-out infinite; }
+.animate-mouse-wheel { animation: mouse-wheel 1.6s ease-in-out infinite; }
+.animate-chevron-1 { animation: chevron-cascade 1.6s ease-in-out infinite; animation-delay: 0s; }
+.animate-chevron-2 { animation: chevron-cascade 1.6s ease-in-out infinite; animation-delay: 0.2s; }
+.animate-chevron-3 { animation: chevron-cascade 1.6s ease-in-out infinite; animation-delay: 0.4s; }
