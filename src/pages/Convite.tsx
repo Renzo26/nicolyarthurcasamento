@@ -11,15 +11,14 @@ import casal2 from "@/assets/casal-2.jpeg";
 import casal3 from "@/assets/casal-3.jpeg";
 import casal4 from "@/assets/casal-4.jpeg";
 
-// TODO: substituir pelos dados reais
 const EVENT = {
-  date: "DD de mês de AAAA",
-  time: "00h00",
-  venueName: "Nome do Local",
-  address: "Rua Exemplo, 123 — Bairro, Cidade — UF",
-  // Coordenadas exemplo — troque depois
-  lat: -23.55052,
-  lng: -46.633308,
+  date: "17 de outubro de 2026",
+  time: "13h00",
+  venueName: "Chácara Lasareff",
+  address: "Estrada Rio Pequeno, 2555 — Vila Lídia, Rio Grande da Serra — SP",
+  // Coordenadas aproximadas (Rio Grande da Serra) — ajuste fino depois se necessário
+  lat: -23.7438,
+  lng: -46.3985,
 };
 
 const PIX = {
