@@ -6,6 +6,10 @@ import EnvelopeIntro from "@/components/wedding/EnvelopeIntro";
 import ScrollHint from "@/components/wedding/ScrollHint";
 import Section from "@/components/wedding/Section";
 import RsvpSection from "@/components/wedding/RsvpSection";
+import casal1 from "@/assets/casal-1.jpeg";
+import casal2 from "@/assets/casal-2.jpeg";
+import casal3 from "@/assets/casal-3.jpeg";
+import casal4 from "@/assets/casal-4.jpeg";
 
 // TODO: substituir pelos dados reais
 const EVENT = {
@@ -44,8 +48,22 @@ const Convite = () => {
       {introDone && <ScrollHint />}
 
       {/* TELA 1 — Capa após envelope */}
-      <Section id="capa">
-        <div className="text-center space-y-6">
+      <Section id="capa" className="!p-0 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src={casal3}
+            alt="Arthur e Nicoly"
+            className="w-full h-full object-cover"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, hsl(var(--wedding-bg) / 0.55) 0%, hsl(var(--wedding-bg) / 0.35) 40%, hsl(var(--wedding-bg) / 0.92) 100%)",
+            }}
+          />
+        </div>
+        <div className="relative text-center space-y-6 px-6 py-20">
           <p className="font-body text-xs uppercase tracking-[0.4em] opacity-60">
             Convite de casamento
           </p>
@@ -92,18 +110,19 @@ const Convite = () => {
             1 Coríntios 13:4-7
           </p>
 
-          {/* Placeholder para fotos futuras */}
           <div className="grid grid-cols-3 gap-3 pt-6">
-            {[1, 2, 3].map((i) => (
+            {[casal1, casal2, casal3].map((src, i) => (
               <div
                 key={i}
-                className="aspect-[3/4] rounded-md flex items-center justify-center text-xs opacity-40"
-                style={{
-                  background: "hsl(var(--wedding-bg))",
-                  border: "1px dashed hsl(var(--wedding-gold) / 0.5)",
-                }}
+                className="aspect-[3/4] rounded-md overflow-hidden shadow-sm"
+                style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
               >
-                foto {i}
+                <img
+                  src={src}
+                  alt={`Arthur e Nicoly ${i + 1}`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
             ))}
           </div>
@@ -122,15 +141,16 @@ const Convite = () => {
             </p>
           </div>
 
-          {/* Foto placeholder em destaque */}
           <div
-            className="aspect-[16/9] rounded-lg flex items-center justify-center text-sm opacity-50"
-            style={{
-              background: "hsl(var(--wedding-paper))",
-              border: "1px dashed hsl(var(--wedding-gold) / 0.5)",
-            }}
+            className="aspect-[16/9] rounded-lg overflow-hidden shadow-md"
+            style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
           >
-            foto de capa
+            <img
+              src={casal4}
+              alt="Arthur e Nicoly no parque"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6">
