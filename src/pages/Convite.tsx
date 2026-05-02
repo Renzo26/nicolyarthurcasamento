@@ -8,6 +8,7 @@ import casal1 from "@/assets/casal-1.jpeg";
 import casal2 from "@/assets/casal-2.jpeg";
 import casal3 from "@/assets/casal-3.jpeg";
 import casal4 from "@/assets/casal-4.jpeg";
+import floralFrame from "@/assets/floral-frame.png";
 
 const EVENT = {
   date: "17 de outubro de 2026",
@@ -38,9 +39,21 @@ const Convite = () => {
 
   return (
     <main
-      className="w-full"
+      className="w-full relative"
       style={{ background: "hsl(var(--wedding-bg))", color: "hsl(var(--wedding-ink))" }}
     >
+      {/* Moldura floral decorativa — fixa no fundo, cobre toda a viewport */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 opacity-70 sm:opacity-60"
+        style={{
+          backgroundImage: `url(${floralFrame})`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundSize: "100% 100%",
+        }}
+      />
+
       <EnvelopeIntro onComplete={() => {}} />
 
       {/* TELA 1 — Capa após envelope */}
