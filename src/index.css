@@ -38,12 +38,15 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Wedding palette */
-    --wedding-bg: 36 38% 95%;
-    --wedding-paper: 34 40% 92%;
-    --wedding-ink: 20 25% 18%;
+    /* Wedding palette — noite dourada */
+    --wedding-night: 26 30% 8%;      /* fundo escuro quente */
+    --wedding-night-soft: 26 22% 13%; /* cards de vidro sobre o escuro */
+    --wedding-bg: 37 48% 94%;        /* seções claras (Nossa história) */
+    --wedding-paper: 36 42% 90%;
+    --wedding-cream: 41 55% 93%;     /* texto sobre o escuro */
+    --wedding-ink: 24 28% 16%;       /* texto sobre o claro */
     --wedding-muted: 22 12% 42%;
-    --wedding-gold: 32 45% 52%;
+    --wedding-gold: 40 47% 62%;
     --wedding-rose: 12 45% 58%;
     --wedding-sage: 95 12% 45%;
 
@@ -108,9 +111,9 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  /* Lenis controla a rolagem suave; scroll-behavior nativo conflita com ela */
   html {
-    scroll-behavior: smooth;
-    scroll-snap-type: y proximity;
+    scroll-behavior: auto;
   }
 
   body {
@@ -120,7 +123,7 @@ All colors MUST be HSL.
 
 @layer utilities {
   .font-display { font-family: 'Cormorant Garamond', serif; }
-  .font-script { font-family: 'Italianno', cursive; }
+  .font-script { font-family: 'Pinyon Script', 'Italianno', cursive; }
   .font-body { font-family: 'Inter', sans-serif; }
 }
 
@@ -160,7 +163,24 @@ All colors MUST be HSL.
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+/* Zoom lento e contínuo na foto de capa — parte já ampliada para
+   enquadrar o casal da cintura para cima, como no convite impresso */
+@keyframes ken-burns {
+  from { transform: scale(1.14); }
+  to   { transform: scale(1.24); }
+}
 .animate-fade-up { animation: fade-up 0.8s ease-out both; }
+.animate-ken-burns { animation: ken-burns 24s ease-out both alternate infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-ken-burns,
+  .animate-mouse-wheel,
+  .animate-soft-pulse,
+  .animate-scroll-hint {
+    animation: none;
+  }
+}
 .animate-scroll-hint { animation: scroll-hint 1.6s ease-in-out infinite; }
 .animate-soft-pulse { animation: soft-pulse 2s ease-out infinite; }
 .animate-mouse-wheel { animation: mouse-wheel 1.6s ease-in-out infinite; }

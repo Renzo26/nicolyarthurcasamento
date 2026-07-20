@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # O Vite embute as VITE_* no bundle durante o build. Configure estas
+      # variáveis no painel do EasyPanel (Environment) — elas são lidas aqui
+      # e repassadas como build-args.
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+        VITE_SUPABASE_PROJECT_ID: ${VITE_SUPABASE_PROJECT_ID}
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      easypanel:
+        aliases:
+          - nicolyarthurcasamento
+
+networks:
+  easypanel:
+    external: true

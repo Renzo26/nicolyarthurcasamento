@@ -109,30 +109,32 @@ const RsvpSection = () => {
 
   return (
     <div className="space-y-8">
-      <div className="text-center space-y-3">
-        <p className="font-script text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
-          Confirme sua presença
-        </p>
-        <p className="font-body text-sm opacity-70 max-w-md mx-auto">
-          Digite o nome do responsável pela família ou de qualquer convidado para encontrar seu convite.
-        </p>
-      </div>
-
-      <form onSubmit={handleSearch} className="flex gap-2">
+      <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+          <Search
+            className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2"
+            style={{ color: "hsl(var(--wedding-gold))" }}
+          />
           <Input
             placeholder="Buscar por nome..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-12 bg-white/60 border-[hsl(var(--wedding-gold))]/40"
+            className="h-16 rounded-xl pl-14 font-display text-lg text-[hsl(var(--wedding-cream))] placeholder:text-[hsl(var(--wedding-cream))]/45 focus-visible:ring-[hsl(var(--wedding-gold))]"
+            style={{
+              background: "hsl(var(--wedding-night) / 0.65)",
+              borderColor: "hsl(var(--wedding-gold) / 0.45)",
+            }}
           />
         </div>
         <Button
           type="submit"
           disabled={search.trim().length < 2}
-          className="h-12 px-6"
-          style={{ background: "hsl(var(--wedding-rose))", color: "white" }}
+          className="h-16 rounded-xl px-10 font-display font-semibold text-sm uppercase tracking-[0.28em] transition-transform hover:scale-[1.02] hover:opacity-100"
+          style={{
+            background: "linear-gradient(180deg, hsl(42 52% 82%) 0%, hsl(38 40% 62%) 100%)",
+            color: "hsl(26 35% 14%)",
+            boxShadow: "0 8px 26px hsl(26 30% 4% / 0.5)",
+          }}
         >
           Buscar
         </Button>
@@ -159,8 +161,11 @@ const RsvpSection = () => {
             <button
               key={f.id}
               onClick={() => setSelectedFamilyId(f.id)}
-              className="w-full text-left rounded-lg border bg-white/60 p-4 hover:bg-white transition-colors"
-              style={{ borderColor: "hsl(var(--wedding-gold) / 0.4)" }}
+              className="w-full rounded-lg border p-4 text-left transition-colors hover:border-[hsl(var(--wedding-gold))]"
+              style={{
+                borderColor: "hsl(var(--wedding-gold) / 0.35)",
+                background: "hsl(var(--wedding-night-soft) / 0.8)",
+              }}
             >
               <div className="font-display text-lg">{f.nome_lider}</div>
               <div className="text-xs opacity-60 font-body flex items-center gap-1.5">
@@ -174,22 +179,31 @@ const RsvpSection = () => {
 
       {selectedFamily && (
         <div
-          className="rounded-xl border bg-white/70 p-6 space-y-5 shadow-sm"
-          style={{ borderColor: "hsl(var(--wedding-gold) / 0.4)" }}
+          className="space-y-5 rounded-2xl border p-6 lg:p-8"
+          style={{
+            borderColor: "hsl(var(--wedding-gold) / 0.4)",
+            background: "hsl(var(--wedding-night-soft) / 0.8)",
+          }}
         >
           <div className="text-center">
-            <p className="font-body text-xs uppercase tracking-[0.25em] opacity-60">
+            <p
+              className="font-body text-xs uppercase tracking-[0.3em]"
+              style={{ color: "hsl(var(--wedding-gold))" }}
+            >
               Família
             </p>
-            <p className="font-display text-2xl mt-1">{selectedFamily.nome_lider}</p>
+            <p className="mt-2 font-display text-2xl lg:text-3xl">{selectedFamily.nome_lider}</p>
           </div>
 
           <ul className="space-y-2">
             {selectedFamily.convidados.map((c) => (
               <li
                 key={c.id}
-                className="flex items-center justify-between rounded-lg border bg-white px-4 py-3"
-                style={{ borderColor: "hsl(var(--wedding-gold) / 0.25)" }}
+                className="flex items-center justify-between rounded-lg border px-4 py-3"
+                style={{
+                  borderColor: "hsl(var(--wedding-gold) / 0.22)",
+                  background: "hsl(var(--wedding-night) / 0.5)",
+                }}
               >
                 <div className="flex items-center gap-3">
                   <Checkbox
@@ -218,18 +232,21 @@ const RsvpSection = () => {
             <Button
               onClick={() => confirmAll.mutate(selectedFamily.id)}
               disabled={confirmAll.isPending}
-              className="flex-1 h-11"
-              style={{ background: "hsl(var(--wedding-rose))", color: "white" }}
+              className="h-12 flex-1 font-body text-xs uppercase tracking-[0.2em] hover:opacity-90"
+              style={{ background: "hsl(var(--wedding-gold))", color: "hsl(var(--wedding-night))" }}
             >
-              <Check className="h-4 w-4 mr-1" />
+              <Check className="mr-1 h-4 w-4" />
               Confirmar todos
             </Button>
             <Button
               onClick={() => cancelAll.mutate(selectedFamily.id)}
               disabled={cancelAll.isPending}
               variant="outline"
-              className="flex-1 h-11"
-              style={{ borderColor: "hsl(var(--wedding-rose))", color: "hsl(var(--wedding-rose))" }}
+              className="h-12 flex-1 bg-transparent font-body text-xs uppercase tracking-[0.2em] hover:bg-white/5"
+              style={{
+                borderColor: "hsl(var(--wedding-gold) / 0.4)",
+                color: "hsl(var(--wedding-cream))",
+              }}
             >
               <X className="h-4 w-4 mr-1" />
               Cancelar presença

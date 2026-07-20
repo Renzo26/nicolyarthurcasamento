@@ -1,22 +1,24 @@
-import { MapPin, Navigation, Calendar, Heart, Copy, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { MapPin, Navigation, Calendar, Heart, Copy, Apple, QrCode } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import EnvelopeIntro from "@/components/wedding/EnvelopeIntro";
+import Hero from "@/components/wedding/Hero";
 import Section from "@/components/wedding/Section";
+import StorySection from "@/components/wedding/StorySection";
 import RsvpSection from "@/components/wedding/RsvpSection";
-import casal1 from "@/assets/casal-1.jpeg";
+import Ornament from "@/components/wedding/Ornament";
+import Flourish from "@/components/wedding/Flourish";
+import Medallion from "@/components/wedding/Medallion";
 import casal2 from "@/assets/casal-2.jpeg";
-import casal3 from "@/assets/casal-3.jpeg";
 import casal4 from "@/assets/casal-4.jpeg";
+import moldura from "@/assets/moldura.jpg";
 
 const EVENT = {
   date: "17 de outubro de 2026",
   time: "13h00",
   venueName: "Chácara Lasareff",
-  address: "Estrada Rio Pequeno, 2555 — Vila Lídia, Rio Grande da Serra — SP",
-  // Coordenadas aproximadas (Rio Grande da Serra) — ajuste fino depois se necessário
-  lat: -23.7438,
-  lng: -46.3985,
+  addressLine1: "Estrada Rio Pequeno, 2555 — Vila Lídia",
+  addressLine2: "Rio Grande da Serra — SP",
 };
 
 const PIX = {
@@ -24,8 +26,64 @@ const PIX = {
   label: "Arthur & Nicoly",
 };
 
+const GOLD = "hsl(var(--wedding-gold))";
+const GOLD_LINE = "hsl(var(--wedding-gold) / 0.5)";
+
+/**
+ * Título em caligrafia metalizada. O halo vai em text-shadow (segue o
+ * contorno das letras) — drop-shadow desenharia a caixa do gradiente.
+ */
+const glowTitle = (tone: "gold" | "cream") => ({
+  backgroundImage:
+    tone === "gold"
+      ? "linear-gradient(180deg, hsl(44 65% 88%) 0%, hsl(40 55% 68%) 45%, hsl(36 45% 52%) 100%)"
+      : "linear-gradient(180deg, hsl(44 45% 97%) 0%, hsl(40 30% 88%) 55%, hsl(38 25% 78%) 100%)",
+  WebkitBackgroundClip: "text" as const,
+  backgroundClip: "text" as const,
+  color: "transparent",
+  textShadow: `0 0 32px hsl(40 65% 58% / ${tone === "gold" ? 0.45 : 0.28})`,
+});
+
+/** Arte pronta de moldura: filete dourado, buquês nos cantos e brilho quente. */
+const FrameArt = () => (
+  <img
+    src={moldura}
+    alt=""
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+  />
+);
+
+/** Botão vazado dourado sobre o fundo escuro. */
+const MapButton = ({
+  href,
+  icon: Icon,
+  children,
+}: {
+  href: string;
+  icon: typeof MapPin;
+  children: React.ReactNode;
+}) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group relative flex h-14 items-center justify-center gap-3 overflow-hidden rounded-md font-body text-sm transition-colors"
+    style={{ border: `1px solid ${GOLD_LINE}`, color: "hsl(var(--wedding-cream))" }}
+  >
+    <span
+      className="absolute inset-0 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
+      style={{ background: "hsl(var(--wedding-gold) / 0.16)" }}
+    />
+    <Icon className="relative h-4 w-4" style={{ color: GOLD }} />
+    <span className="relative">{children}</span>
+  </a>
+);
+
 const Convite = () => {
-  const fullAddress = `${EVENT.venueName}, ${EVENT.address}`;
+  const [introDone, setIntroDone] = useState(false);
+
+  const fullAddress = `${EVENT.venueName}, ${EVENT.addressLine1}, ${EVENT.addressLine2}`;
   const encoded = encodeURIComponent(fullAddress);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
   const wazeUrl = `https://waze.com/ul?q=${encoded}&navigate=yes`;
@@ -39,240 +97,275 @@ const Convite = () => {
   return (
     <main
       className="w-full"
-      style={{ background: "hsl(var(--wedding-bg))", color: "hsl(var(--wedding-ink))" }}
+      style={{ background: "hsl(var(--wedding-night))", color: "hsl(var(--wedding-cream))" }}
     >
-      <EnvelopeIntro onComplete={() => {}} />
+      <EnvelopeIntro onComplete={() => setIntroDone(true)} />
 
-      {/* TELA 1 — Capa após envelope */}
-      <Section id="capa">
-        <div className="text-center space-y-6 relative">
-          <p className="font-body text-xs uppercase tracking-[0.4em] opacity-60">
-            Convite de casamento
-          </p>
-          <h1
-            className="font-script text-7xl sm:text-8xl leading-none"
-            style={{ color: "hsl(var(--wedding-rose))" }}
-          >
-            Arthur<br />
-            <span className="font-display italic text-4xl sm:text-5xl opacity-80">&</span>
-            <br />
-            Nicoly
-          </h1>
-          <div
-            className="mx-auto w-16 h-px"
-            style={{ background: "hsl(var(--wedding-gold))" }}
-          />
-          <p className="font-display text-lg tracking-[0.2em] uppercase">
-            {EVENT.date}
-          </p>
-
-          {/* Indicador "mouse scroll" decorativo na capa */}
-          <div className="pt-10 flex flex-col items-center gap-2 opacity-80">
-            <span
-              className="flex h-9 w-6 items-start justify-center rounded-full pt-1.5"
-              style={{ border: "2px solid hsl(var(--wedding-rose))" }}
-              aria-hidden="true"
-            >
-              <span
-                className="block h-1.5 w-1 rounded-full animate-mouse-wheel"
-                style={{ background: "hsl(var(--wedding-rose))" }}
-              />
-            </span>
-            <span
-              className="font-display tracking-[0.3em] text-[10px] uppercase"
-              style={{ color: "hsl(var(--wedding-rose))" }}
-            >
-              Deslize para baixo
-            </span>
-          </div>
-        </div>
-      </Section>
+      {/* TELA 1 — Capa */}
+      <Hero start={introDone} date={EVENT.date} />
 
       {/* TELA 2 — Versículo */}
-      <Section id="versiculo" className="!bg-[hsl(var(--wedding-paper))]">
-        <div className="text-center space-y-8">
-          <Heart
-            className="mx-auto h-6 w-6"
-            style={{ color: "hsl(var(--wedding-rose))" }}
+      <Section id="versiculo" width="wide" bgImage={casal4} bgBlur={12} overlay={0.84}>
+        <div className="relative mx-auto max-w-4xl">
+          <Ornament
+            className="pointer-events-none absolute -bottom-16 -left-16 hidden h-72 w-56 lg:block"
+            opacity={0.45}
           />
-          <blockquote className="font-display italic text-2xl sm:text-3xl leading-relaxed">
-            “O amor é paciente, o amor é bondoso.<br />
-            Não inveja, não se vangloria, não se orgulha.<br />
-            Não maltrata, não procura seus interesses,<br />
-            não se ira facilmente, não guarda rancor.<br />
-            O amor não se alegra com a injustiça,<br />
-            mas se alegra com a verdade.<br />
-            Tudo sofre, tudo crê, tudo espera,<br />
-            tudo suporta.”
-          </blockquote>
-          <p
-            className="font-body tracking-[0.3em] text-xs uppercase"
-            style={{ color: "hsl(var(--wedding-gold))" }}
-          >
-            1 Coríntios 13:4-7
-          </p>
+          <Ornament
+            className="pointer-events-none absolute -bottom-16 -right-16 hidden h-72 w-56 lg:block"
+            opacity={0.45}
+            flip
+          />
 
-          {/* Mobile: carrossel horizontal (fotos grandes). Desktop: grid 3 colunas */}
-          <div className="pt-6 -mx-6 sm:mx-0">
-            <div
-              className="flex gap-4 overflow-x-auto px-6 pb-4 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:gap-3 sm:overflow-visible sm:px-0 sm:pb-0"
-              style={{ scrollbarWidth: "none" }}
-            >
-              {[casal1, casal4, casal3].map((src, i) => (
-                <div
-                  key={i}
-                  className="shrink-0 w-[78%] sm:w-auto snap-center aspect-[3/4] rounded-md overflow-hidden shadow-md sm:shadow-sm"
-                  style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
-                >
-                  <img
-                    src={src}
-                    alt={`Arthur e Nicoly ${i + 1}`}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
+          {/* Card de vidro com moldura dourada */}
+          <div
+            className="relative rounded-2xl px-6 py-12 text-center sm:px-12 lg:px-20 lg:py-20"
+            style={{
+              border: `1px solid ${GOLD_LINE}`,
+              background: "hsl(var(--wedding-night) / 0.55)",
+              backdropFilter: "blur(3px)",
+            }}
+          >
+            <Heart
+              className="mx-auto h-7 w-7"
+              fill="hsl(var(--wedding-cream))"
+              style={{ color: "hsl(var(--wedding-cream))" }}
+            />
+
+            <blockquote className="mt-8 font-display italic leading-relaxed text-xl sm:text-2xl lg:text-4xl">
+              “O amor é paciente, o amor é bondoso.<br />
+              Não inveja, não se vangloria, não se orgulha.<br />
+              Não maltrata, não procura seus interesses,<br />
+              não se ira facilmente, não guarda rancor.<br />
+              O amor não se alegra com a injustiça,<br />
+              mas se alegra com a verdade.<br />
+              Tudo sofre, tudo crê, tudo espera,<br />
+              tudo suporta.”
+            </blockquote>
+
+            {/* Divisor —— ◆ —— */}
+            <div className="mt-10 flex items-center justify-center gap-3">
+              <span className="h-px w-20 lg:w-32" style={{ background: GOLD_LINE }} />
+              <span className="rotate-45" style={{ background: GOLD, width: 6, height: 6 }} />
+              <span className="h-px w-20 lg:w-32" style={{ background: GOLD_LINE }} />
             </div>
-            <p className="sm:hidden text-center text-xs opacity-50 font-body mt-1">
-              ← deslize para ver mais →
+
+            <p
+              className="mt-6 font-body text-xs lg:text-sm uppercase tracking-[0.35em]"
+              style={{ color: GOLD }}
+            >
+              1 Coríntios 13:4-7
             </p>
           </div>
         </div>
       </Section>
 
-      {/* TELA 3 — Data, local e mapa */}
-      <Section id="evento">
-        <div className="space-y-10">
-          <div className="text-center space-y-3">
-            <p className="font-body text-xs uppercase tracking-[0.3em] opacity-60">
-              Save the date
-            </p>
-            <p className="font-script text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
-              Quando & Onde
-            </p>
-          </div>
+      {/* TELA 3 — Nossa história */}
+      <StorySection />
 
-          <div
-            className="aspect-[4/5] sm:aspect-[16/9] rounded-lg overflow-hidden shadow-md"
-            style={{ border: "1px solid hsl(var(--wedding-gold) / 0.4)" }}
-          >
-            <img
-              src={casal2}
-              alt="Arthur e Nicoly"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
+      {/* TELA 4 — Data, local e mapa */}
+      <Section id="evento" width="wide" bgImage={casal2} bgBlur={22} overlay={0.88}>
+        <div className="text-center">
+          <p className="font-body text-xs lg:text-sm uppercase tracking-[0.45em]">Save the date</p>
+          <h2 className="mt-4 font-script text-6xl lg:text-8xl xl:text-9xl">Quando &amp; Onde</h2>
 
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div
-              className="rounded-lg p-6 text-center space-y-2"
-              style={{ background: "hsl(var(--wedding-paper))" }}
-            >
-              <Calendar className="mx-auto h-5 w-5" style={{ color: "hsl(var(--wedding-rose))" }} />
-              <p className="font-body text-xs uppercase tracking-widest opacity-60">Data</p>
-              <p className="font-display text-xl">{EVENT.date}</p>
-              <p className="font-body text-sm opacity-70">{EVENT.time}</p>
+          {/* Data | ♡ | Local */}
+          <div className="mt-16 flex flex-col items-stretch gap-10 lg:flex-row lg:items-center lg:gap-0">
+            <div className="flex-1 space-y-3">
+              <Calendar className="mx-auto h-9 w-9 lg:h-11 lg:w-11" style={{ color: GOLD }} strokeWidth={1.2} />
+              <p className="font-display text-2xl lg:text-4xl">{EVENT.date}</p>
+              <p className="font-display text-xl lg:text-3xl opacity-90">{EVENT.time}</p>
             </div>
-            <div
-              className="rounded-lg p-6 text-center space-y-2"
-              style={{ background: "hsl(var(--wedding-paper))" }}
-            >
-              <MapPin className="mx-auto h-5 w-5" style={{ color: "hsl(var(--wedding-rose))" }} />
-              <p className="font-body text-xs uppercase tracking-widest opacity-60">Local</p>
-              <p className="font-display text-xl">{EVENT.venueName}</p>
-              <p className="font-body text-sm opacity-70">{EVENT.address}</p>
+
+            {/* Divisor vertical com coração (horizontal no mobile) */}
+            <div className="flex shrink-0 items-center justify-center lg:h-56 lg:w-24 lg:flex-col">
+              <span className="h-px flex-1 lg:h-auto lg:w-px lg:flex-1" style={{ background: GOLD_LINE }} />
+              <Heart
+                className="mx-4 h-4 w-4 lg:mx-0 lg:my-4"
+                fill={GOLD}
+                style={{ color: GOLD }}
+              />
+              <span className="h-px flex-1 lg:h-auto lg:w-px lg:flex-1" style={{ background: GOLD_LINE }} />
+            </div>
+
+            <div className="flex-1 space-y-3">
+              <MapPin className="mx-auto h-9 w-9 lg:h-11 lg:w-11" style={{ color: GOLD }} strokeWidth={1.2} />
+              <p className="font-display text-2xl lg:text-4xl">{EVENT.venueName}</p>
+              <p className="font-display text-lg lg:text-2xl opacity-90">{EVENT.addressLine1}</p>
+              <p className="font-display text-lg lg:text-2xl opacity-90">{EVENT.addressLine2}</p>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <p className="text-center font-body text-xs uppercase tracking-[0.25em] opacity-60">
+          {/* Como chegar */}
+          <div className="mt-16">
+            <p className="font-body text-xs uppercase tracking-[0.4em]" style={{ color: GOLD }}>
               Como chegar
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <Button asChild variant="outline" className="h-12">
-                <a href={wazeUrl} target="_blank" rel="noopener noreferrer">
-                  <Navigation className="h-4 w-4 mr-2" /> Waze
-                </a>
-              </Button>
-              <Button asChild variant="outline" className="h-12">
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
-                  <MapPin className="h-4 w-4 mr-2" /> Google Maps
-                </a>
-              </Button>
-              <Button asChild variant="outline" className="h-12">
-                <a href={appleUrl} target="_blank" rel="noopener noreferrer">
-                  <MapPin className="h-4 w-4 mr-2" /> Apple Maps
-                </a>
-              </Button>
+            <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-3">
+              <MapButton href={wazeUrl} icon={Navigation}>
+                Waze
+              </MapButton>
+              <MapButton href={mapsUrl} icon={MapPin}>
+                Google Maps
+              </MapButton>
+              <MapButton href={appleUrl} icon={Apple}>
+                Apple Maps
+              </MapButton>
             </div>
           </div>
         </div>
       </Section>
 
-      {/* TELA 4 — Sem presentes / PIX */}
-      <Section id="presentes" className="!bg-[hsl(var(--wedding-paper))]">
-        <div className="space-y-8 text-center">
-          <AlertCircle
-            className="mx-auto h-7 w-7"
-            style={{ color: "hsl(var(--wedding-rose))" }}
-          />
-          <p className="font-script text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
-            Um recadinho
-          </p>
-          <div className="font-display text-lg leading-relaxed max-w-xl mx-auto space-y-4">
-            <p>
-              Com muito carinho, queremos avisar que <strong>já mobiliamos toda a nossa casa</strong>,
-              então, por gentileza, <strong>não compre presentes para nós</strong>.
-            </p>
-            <p>
-              Sua presença já é o nosso maior presente. 💛
-            </p>
-            <p className="font-body text-sm opacity-75">
-              Caso ainda assim queira nos abençoar, ficaremos imensamente felizes em receber via PIX:
-            </p>
+      {/* TELA 5 — Sem presentes / PIX */}
+      <Section id="presentes" width="wide" decor={<FrameArt />}>
+        <div className="relative lg:grid lg:grid-cols-[1fr_0.78fr] lg:items-center lg:gap-20">
+          {/* Recado */}
+          <div className="text-center lg:text-left">
+            <Medallion
+              motif="sprig"
+              topHeart
+              className="mx-auto h-28 w-24 lg:mx-0 lg:h-32 lg:w-28"
+            />
+
+            <h2
+              className="mt-6 font-script text-6xl leading-[1.1] lg:text-8xl"
+              style={glowTitle("cream")}
+            >
+              Um recadinho
+            </h2>
+            <Flourish className="mt-4 lg:justify-start" />
+
+            <div className="mx-auto mt-10 max-w-xl space-y-6 font-display text-lg leading-relaxed lg:mx-0 lg:text-2xl">
+              <p style={{ color: GOLD }}>
+                Com muito carinho, queremos avisar que já mobiliamos toda a nossa casa, então, por
+                gentileza, não compre presentes para nós.
+              </p>
+              <p>
+                Sua presença já é o nosso maior presente.{" "}
+                <Heart
+                  className="ml-1 inline-block h-5 w-5 align-[-0.15em]"
+                  fill={GOLD}
+                  style={{ color: GOLD }}
+                />
+              </p>
+              <p className="text-base lg:text-xl opacity-85">
+                Caso ainda assim queira nos abençoar, ficaremos imensamente felizes em receber via
+                PIX:
+              </p>
+            </div>
           </div>
 
+          {/* Cartão do PIX com borda luminosa */}
           <div
-            className="mx-auto max-w-sm rounded-xl p-6 space-y-4"
-            style={{ background: "hsl(var(--wedding-bg))" }}
+            className="mx-auto mt-14 w-full max-w-sm rounded-[2rem] p-1.5 lg:mt-0"
+            style={{
+              border: "1px solid hsl(var(--wedding-gold) / 0.45)",
+              boxShadow: "0 0 45px hsl(40 60% 50% / 0.22)",
+            }}
           >
-            {/* QR placeholder */}
             <div
-              className="mx-auto w-48 h-48 rounded-lg flex items-center justify-center text-xs opacity-50"
+              className="space-y-5 rounded-[1.6rem] px-6 py-8"
               style={{
-                background: "white",
-                border: "1px dashed hsl(var(--wedding-gold) / 0.6)",
+                border: "1px solid hsl(var(--wedding-gold) / 0.55)",
+                background: "hsl(var(--wedding-night-soft) / 0.55)",
               }}
             >
-              QR Code do PIX
+              <Flourish variant="scroll" className="mx-auto h-5 w-32" opacity={0.9} />
+
+              <div
+                className="mx-auto flex aspect-square w-full max-w-[15rem] flex-col items-center justify-center gap-3 rounded-2xl"
+                style={{ background: "hsl(40 30% 97%)", color: "hsl(var(--wedding-ink))" }}
+              >
+                <QrCode className="h-9 w-9 opacity-45" strokeWidth={1.4} />
+                <span className="font-display text-base">QR Code do PIX</span>
+              </div>
+
+              <Flourish className="!gap-2" />
+
+              <div className="text-center">
+                <p
+                  className="font-display font-semibold text-xs uppercase tracking-[0.32em]"
+                  style={{ color: GOLD }}
+                >
+                  Chave PIX
+                </p>
+                <p className="mt-3 break-all font-display text-xl">{PIX.key}</p>
+                <p className="mt-2 font-display text-sm opacity-70">{PIX.label}</p>
+              </div>
+
+              <Flourish className="!gap-2" />
+
+              <button
+                type="button"
+                onClick={copyPix}
+                className="group relative flex h-14 w-full items-center justify-center gap-3 overflow-hidden rounded-xl font-display font-semibold text-xs uppercase tracking-[0.26em] lg:text-sm"
+                style={{ border: `1px solid ${GOLD_LINE}`, color: GOLD }}
+              >
+                <span
+                  className="absolute inset-0 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
+                  style={{ background: "hsl(var(--wedding-gold) / 0.16)" }}
+                />
+                <Copy className="relative h-4 w-4" />
+                <span className="relative">Copiar chave PIX</span>
+              </button>
             </div>
-            <div>
-              <p className="font-body text-xs uppercase tracking-widest opacity-60">Chave PIX</p>
-              <p className="font-display text-lg break-all">{PIX.key}</p>
-              <p className="font-body text-xs opacity-60 mt-1">{PIX.label}</p>
-            </div>
-            <Button
-              onClick={copyPix}
-              className="w-full h-11"
-              style={{ background: "hsl(var(--wedding-rose))", color: "white" }}
-            >
-              <Copy className="h-4 w-4 mr-2" /> Copiar chave PIX
-            </Button>
           </div>
         </div>
       </Section>
 
-      {/* TELA 5 — Confirmação */}
-      <Section id="confirmar">
-        <RsvpSection />
+      {/* TELA 6 — Confirmação */}
+      <Section
+        id="confirmar"
+        width="wide"
+        decor={<FrameArt />}
+      >
+        <div className="relative mx-auto max-w-5xl px-2 py-6 text-center lg:py-10">
+          <Medallion motif="heart" className="mx-auto h-24 w-24 lg:h-28 lg:w-28" />
+          <Flourish variant="scroll" className="mx-auto mt-2 h-5 w-28" opacity={0.8} />
+
+          <h2
+            className="mt-4 font-script text-5xl leading-[1.15] sm:text-6xl lg:text-8xl"
+            style={glowTitle("gold")}
+          >
+            Confirme sua presença
+          </h2>
+          <Flourish className="mt-5" />
+
+          <p className="mx-auto mt-8 max-w-lg font-display text-lg leading-relaxed opacity-90 lg:text-xl">
+            Digite o nome do responsável pela família ou de qualquer convidado para encontrar seu
+            convite.
+          </p>
+
+          <div className="mx-auto mt-10 max-w-2xl">
+            <RsvpSection />
+          </div>
+        </div>
       </Section>
 
       <footer
-        className="py-8 text-center font-script text-2xl"
-        style={{ background: "hsl(var(--wedding-paper))", color: "hsl(var(--wedding-rose))" }}
+        className="relative overflow-hidden py-20 text-center lg:py-28"
+        style={{ background: "hsl(var(--wedding-night))" }}
       >
-        Arthur &amp; Nicoly
+        <Ornament
+          className="pointer-events-none absolute -bottom-10 left-4 h-48 w-36 lg:h-60 lg:w-44"
+          opacity={0.25}
+        />
+        <Ornament
+          className="pointer-events-none absolute -bottom-10 right-4 h-48 w-36 lg:h-60 lg:w-44"
+          opacity={0.25}
+          flip
+        />
+        <p className="font-script text-6xl lg:text-8xl" style={{ color: "hsl(var(--wedding-cream))" }}>
+          Arthur &amp; Nicoly
+        </p>
+        <div className="mx-auto my-6 flex items-center justify-center gap-4">
+          <span className="h-px w-14 lg:w-20" style={{ background: GOLD_LINE }} />
+          <Heart className="h-3 w-3" fill={GOLD} style={{ color: GOLD }} />
+          <span className="h-px w-14 lg:w-20" style={{ background: GOLD_LINE }} />
+        </div>
+        <p className="font-body text-xs uppercase tracking-[0.4em]" style={{ color: GOLD }}>
+          {EVENT.date}
+        </p>
       </footer>
     </main>
   );

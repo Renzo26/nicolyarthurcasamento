@@ -1,8 +1,10 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLenis } from "lenis/react";
 
 const ScrollHint = () => {
   const [visible, setVisible] = useState(false);
+  const lenis = useLenis();
 
   useEffect(() => {
     // Aparece logo após o envelope encerrar
@@ -24,7 +26,7 @@ const ScrollHint = () => {
   }, []);
 
   const handleClick = () => {
-    window.scrollBy({ top: window.innerHeight * 0.9, behavior: "smooth" });
+    lenis?.scrollTo(window.scrollY + window.innerHeight * 0.9, { duration: 1.2 });
   };
 
   if (!visible) return null;

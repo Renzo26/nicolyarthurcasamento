@@ -21,7 +21,7 @@ const EnvelopeIntro = ({ onComplete }: EnvelopeIntroProps) => {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{
-        background: "hsl(var(--wedding-bg))",
+        background: "hsl(var(--wedding-night))",
         animation: "envelope-fade 3s ease-in-out forwards",
       }}
       aria-hidden="true"
@@ -34,13 +34,13 @@ const EnvelopeIntro = ({ onComplete }: EnvelopeIntroProps) => {
         <div
           className="absolute inset-x-4 top-4 bottom-6 rounded-sm shadow-md flex flex-col items-center justify-center px-4 text-center"
           style={{
-            background: "hsl(var(--wedding-paper))",
+            background: "hsl(var(--wedding-bg))",
             color: "hsl(var(--wedding-ink))",
             animation: "envelope-letter 3s ease-out forwards",
             zIndex: 1,
           }}
         >
-          <p className="font-script text-4xl sm:text-5xl" style={{ color: "hsl(var(--wedding-rose))" }}>
+          <p className="font-script text-4xl sm:text-5xl" style={{ color: "hsl(var(--wedding-gold))" }}>
             Arthur &amp; Nicoly
           </p>
           <p className="font-display tracking-[0.3em] text-xs sm:text-sm mt-2 uppercase">
@@ -51,15 +51,19 @@ const EnvelopeIntro = ({ onComplete }: EnvelopeIntroProps) => {
         {/* Envelope body */}
         <div
           className="absolute inset-0 rounded-sm shadow-xl"
-          style={{ background: "hsl(var(--wedding-rose))", zIndex: 2 }}
+          style={{
+            background: "hsl(var(--wedding-night-soft))",
+            border: "1px solid hsl(var(--wedding-gold) / 0.45)",
+            zIndex: 2,
+          }}
         />
         {/* Inside pocket (front) */}
         <div
           className="absolute inset-x-0 bottom-0 rounded-b-sm"
           style={{
             height: "60%",
-            background: "hsl(var(--wedding-rose))",
-            borderTop: "1px solid rgba(0,0,0,0.05)",
+            background: "hsl(var(--wedding-night-soft))",
+            borderTop: "1px solid hsl(var(--wedding-gold) / 0.35)",
             zIndex: 3,
           }}
         />
@@ -80,8 +84,8 @@ const EnvelopeIntro = ({ onComplete }: EnvelopeIntroProps) => {
               margin: "0 auto",
               borderLeft: "min(40vw, 160px) solid transparent",
               borderRight: "min(40vw, 160px) solid transparent",
-              borderTop: "min(26vw, 104px) solid hsl(var(--wedding-rose))",
-              filter: "brightness(0.92)",
+              borderTop: "min(26vw, 104px) solid hsl(var(--wedding-night-soft))",
+              filter: "brightness(1.35)",
             }}
           />
         </div>
@@ -93,7 +97,7 @@ const EnvelopeIntro = ({ onComplete }: EnvelopeIntroProps) => {
             width: "clamp(36px, 10vw, 52px)",
             height: "clamp(36px, 10vw, 52px)",
             background: "hsl(var(--wedding-gold))",
-            color: "hsl(var(--wedding-bg))",
+            color: "hsl(var(--wedding-night))",
             zIndex: 5,
             opacity: 0.95,
           }}
