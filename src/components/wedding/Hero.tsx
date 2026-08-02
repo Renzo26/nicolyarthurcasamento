@@ -14,7 +14,8 @@ const NAV = [
   { label: "Nossa história", target: "#historia" },
   { label: "Detalhes", target: "#evento" },
   { label: "Presentes", target: "#presentes" },
-  { label: "Confirmação", target: "#confirmar" },
+  // "Confirmação" saiu do menu: era o 5º item, quebrava para a segunda linha e
+  // colidia com "Convite de casamento". O botão do hero já leva à seção.
 ];
 
 const GOLD = "hsl(var(--wedding-gold))";
@@ -80,13 +81,16 @@ const Hero = ({ start, date }: HeroProps) => {
           start ? "animate-fade-up" : "opacity-0"
         }`}
       >
-        <ul className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 lg:justify-start lg:gap-x-9 lg:pl-36">
+        {/* No desktop o menu divide os 44% da coluna com o resto do conteúdo:
+            sem o recuo de 144px os itens cabem numa linha só e não invadem o
+            "Convite de casamento". */}
+        <ul className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 lg:gap-x-5 lg:px-2 xl:gap-x-8 xl:px-6">
           {NAV.map((item, i) => (
             <li key={item.target}>
               <button
                 type="button"
                 onClick={() => scrollTo(item.target)}
-                className="group font-display font-semibold text-[11px] uppercase tracking-[0.22em] transition-opacity hover:opacity-100 lg:text-[13px]"
+                className="group whitespace-nowrap font-display font-semibold text-[11px] uppercase tracking-[0.22em] transition-opacity hover:opacity-100 lg:text-[11px] lg:tracking-[0.16em] xl:text-[13px] xl:tracking-[0.22em]"
                 style={{ color: "hsl(var(--wedding-cream))", opacity: i === 0 ? 1 : 0.72 }}
               >
                 {item.label}
