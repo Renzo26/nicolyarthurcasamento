@@ -44,7 +44,10 @@ presença quebraria silenciosamente no navegador.
 3. Expor o domínio para o serviço `frontend` na **porta 80**.
 4. Deploy. A cada novo push, refazer o build (as variáveis são compiladas).
 
-A rede externa `easypanel` já é referenciada no compose.
+O compose não declara redes: o EasyPanel conecta o contêiner na rede do
+projeto e cria os aliases que o proxy usa para rotear o domínio. Declarar a
+rede externa `easypanel` à mão substitui a rede default e derruba o
+roteamento (o site responde `ERR_CONNECTION_CLOSED`).
 
 ### Rodando local
 

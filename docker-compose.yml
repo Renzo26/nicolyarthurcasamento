@@ -11,13 +11,8 @@ services:
         VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
         VITE_SUPABASE_PROJECT_ID: ${VITE_SUPABASE_PROJECT_ID}
     restart: unless-stopped
+    # Sem bloco `networks`: o EasyPanel conecta o contêiner na rede do projeto
+    # e cria os aliases que o proxy usa para achar o backend. Declarar a rede
+    # externa aqui substitui a rede default do Compose e quebra o roteamento.
     expose:
       - "80"
-    networks:
-      easypanel:
-        aliases:
-          - nicolyarthurcasamento
-
-networks:
-  easypanel:
-    external: true
