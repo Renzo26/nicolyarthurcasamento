@@ -12,7 +12,7 @@ page.on("pageerror", (e) => problems.push("PAGEERROR: " + e.message));
 page.on("requestfailed", (r) => problems.push("REQFAILED: " + r.url() + " " + r.failure()?.errorText));
 
 const res = await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
-await page.waitForTimeout(2000);
+await page.waitForTimeout(5000);
 await page.screenshot({ path: out });
 
 console.log("HTTP:", res.status());
