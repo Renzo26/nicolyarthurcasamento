@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Navigation, Calendar, Heart, Copy, Apple, QrCode } from "lucide-react";
+import { MapPin, Navigation, Calendar, Heart, Copy, Apple } from "lucide-react";
 import { toast } from "sonner";
 import EnvelopeIntro from "@/components/wedding/EnvelopeIntro";
 import Hero from "@/components/wedding/Hero";
@@ -12,6 +12,7 @@ import Medallion from "@/components/wedding/Medallion";
 import casal2 from "@/assets/casal-2.jpeg";
 import casal4 from "@/assets/casal-4.jpeg";
 import moldura from "@/assets/moldura.jpg";
+import pixQrCode from "@/assets/pix-qrcode.svg";
 
 const EVENT = {
   date: "17 de outubro de 2026",
@@ -22,8 +23,12 @@ const EVENT = {
 };
 
 const PIX = {
-  key: "chave-pix@exemplo.com",
+  key: "c29c7359-3707-4a53-a359-2ba31c3e099b",
   label: "Arthur & Nicoly",
+  // Payload "copia e cola" do BR Code. É ele que o QR codifica e o que o botão
+  // copia: colado no app do banco, já abre a transferência preenchida.
+  payload:
+    "00020126580014BR.GOV.BCB.PIX0136c29c7359-3707-4a53-a359-2ba31c3e099b5204000053039865802BR592361.427.045 ARTHUR RENZO6009SAO PAULO621405104EAV8nLm426304FDB1",
 };
 
 const GOLD = "hsl(var(--wedding-gold))";
@@ -90,6 +95,11 @@ const Convite = () => {
   const appleUrl = `http://maps.apple.com/?q=${encoded}`;
 
   const copyPix = () => {
+    navigator.clipboard.writeText(PIX.payload);
+    toast.success("Código PIX copiado!");
+  };
+
+  const copyKey = () => {
     navigator.clipboard.writeText(PIX.key);
     toast.success("Chave PIX copiada!");
   };
@@ -273,11 +283,14 @@ const Convite = () => {
               <Flourish variant="scroll" className="mx-auto h-5 w-32" opacity={0.9} />
 
               <div
-                className="mx-auto flex aspect-square w-full max-w-[15rem] flex-col items-center justify-center gap-3 rounded-2xl"
-                style={{ background: "hsl(40 30% 97%)", color: "hsl(var(--wedding-ink))" }}
+                className="mx-auto flex aspect-square w-full max-w-[15rem] items-center justify-center rounded-2xl p-3"
+                style={{ background: "hsl(40 30% 97%)" }}
               >
-                <QrCode className="h-9 w-9 opacity-45" strokeWidth={1.4} />
-                <span className="font-display text-base">QR Code do PIX</span>
+                <img
+                  src={pixQrCode}
+                  alt="QR Code do PIX de Arthur & Nicoly"
+                  className="h-full w-full"
+                />
               </div>
 
               <Flourish className="!gap-2" />
@@ -289,7 +302,14 @@ const Convite = () => {
                 >
                   Chave PIX
                 </p>
-                <p className="mt-3 break-all font-display text-xl">{PIX.key}</p>
+                <button
+                  type="button"
+                  onClick={copyKey}
+                  className="mt-3 w-full break-all font-display text-base leading-relaxed underline-offset-4 transition-opacity hover:underline hover:opacity-80"
+                  title="Copiar apenas a chave"
+                >
+                  {PIX.key}
+                </button>
                 <p className="mt-2 font-display text-sm opacity-70">{PIX.label}</p>
               </div>
 
@@ -306,7 +326,7 @@ const Convite = () => {
                   style={{ background: "hsl(var(--wedding-gold) / 0.16)" }}
                 />
                 <Copy className="relative h-4 w-4" />
-                <span className="relative">Copiar chave PIX</span>
+                <span className="relative">Copiar código PIX</span>
               </button>
             </div>
           </div>
