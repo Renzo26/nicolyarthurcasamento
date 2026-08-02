@@ -71,16 +71,14 @@ const RsvpSection = () => {
     onError: () => toast.error("Não foi possível atualizar agora."),
   });
 
-  const confirmAll = useMutation({
-    mutationFn: async (familiaId: string) => {
-      const { error } = await supabase
-        .from("convidados")
-        .update({ confirmado: true })
-        .eq("familia_id", familiaId);
+  // Age só sobre quem está marcado — o rótulo do botão promete isso.
+  const confirmSelected = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("convidados").update({ confirmado: true }).in("id", ids);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Presença de toda a família confirmada! 💛");
+      toast.success("Presença confirmada! 💛");
       queryClient.invalidateQueries({ queryKey: ["rsvp-search"] });
     },
     onError: () => toast.error("Erro ao confirmar."),
@@ -230,13 +228,19 @@ const RsvpSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-2 pt-2">
             <Button
-              onClick={() => confirmAll.mutate(selectedFamily.id)}
-              disabled={confirmAll.isPending}
+              onClick={() =>
+                confirmSelected.mutate(
+                  selectedFamily.convidados.filter((c) => c.confirmado).map((c) => c.id),
+                )
+              }
+              disabled={
+                confirmSelected.isPending || !selectedFamily.convidados.some((c) => c.confirmado)
+              }
               className="h-12 flex-1 font-body text-xs uppercase tracking-[0.2em] hover:opacity-90"
               style={{ background: "hsl(var(--wedding-gold))", color: "hsl(var(--wedding-night))" }}
             >
               <Check className="mr-1 h-4 w-4" />
-              Confirmar todos
+              Confirmar pessoas selecionadas
             </Button>
             <Button
               onClick={() => cancelAll.mutate(selectedFamily.id)}
