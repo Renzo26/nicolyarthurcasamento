@@ -10,6 +10,7 @@ services:
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
         VITE_SUPABASE_PROJECT_ID: ${VITE_SUPABASE_PROJECT_ID}
+        VITE_ADMIN_PASSWORD: ${VITE_ADMIN_PASSWORD}
     restart: unless-stopped
     # Sem bloco `networks`: o EasyPanel conecta o contêiner na rede do projeto
     # e cria os aliases que o proxy usa para achar o backend. Declarar a rede
