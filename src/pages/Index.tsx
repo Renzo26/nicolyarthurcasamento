@@ -43,6 +43,8 @@ const Index = () => {
     },
   });
 
+  const totalConvidados = familias.reduce((acc, f) => acc + f.total, 0);
+
   const createFamily = useMutation({
     mutationFn: async (nome: string) => {
       const { data, error } = await supabase
@@ -89,7 +91,15 @@ const Index = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <PartyPopper className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">Convidados</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Convidados</h1>
+              {!isLoading && (
+                <p className="text-sm text-muted-foreground">
+                  {familias.length} {familias.length === 1 ? "família" : "famílias"} ·{" "}
+                  {totalConvidados} {totalConvidados === 1 ? "convidado" : "convidados"}
+                </p>
+              )}
+            </div>
           </div>
           <Button onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-1" />
