@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,19 +11,27 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, PartyPopper } from "lucide-react";
+import { Plus, PartyPopper, Search } from "lucide-react";
 import FamilyCard from "@/components/FamilyCard";
 import GuestManager from "@/components/GuestManager";
+import { useRenameFamily } from "@/hooks/use-family-mutations";
+import { bestScore, MATCH_THRESHOLD } from "@/lib/name-search";
 
 interface FamiliaWithCount {
   id: string;
   nome_lider: string;
   total: number;
+  nomes: string[];
 }
 
 const Index = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [nomeLider, setNomeLider] = useState("");
+  const [editingFamily, setEditingFamily] = useState<{ id: string; nome_lider: string } | null>(
+    null,
+  );
+  const [novoNomeFamilia, setNovoNomeFamilia] = useState("");
+  const [busca, setBusca] = useState("");
   const [selectedFamily, setSelectedFamily] = useState<{ id: string; nome_lider: string } | null>(null);
   const queryClient = useQueryClient();
 
@@ -32,18 +40,51 @@ const Index = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("familias")
-        .select("id, nome_lider, convidados(id)")
+        .select("id, nome_lider, convidados(id, nome)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []).map((f) => ({
-        id: f.id,
-        nome_lider: f.nome_lider,
-        total: (f.convidados as unknown as { id: string }[])?.length ?? 0,
-      })) as FamiliaWithCount[];
+      return (data ?? []).map((f) => {
+        const convidados = (f.convidados as unknown as { id: string; nome: string }[]) ?? [];
+        return {
+          id: f.id,
+          nome_lider: f.nome_lider,
+          total: convidados.length,
+          nomes: convidados.map((c) => c.nome),
+        };
+      }) as FamiliaWithCount[];
     },
   });
 
   const totalConvidados = familias.reduce((acc, f) => acc + f.total, 0);
+
+  // Mesma busca tolerante do convite: aqui serve para achar rápido a família
+  // que precisa de correção, mesmo lembrando só o apelido.
+  const familiasVisiveis = useMemo(() => {
+    const term = busca.trim();
+    if (term.length < 2) return familias;
+    return familias
+      .map((f) => ({ familia: f, score: bestScore(term, [f.nome_lider, ...f.nomes]) }))
+      .filter((r) => r.score >= MATCH_THRESHOLD)
+      .sort((a, b) => b.score - a.score)
+      .map((r) => r.familia);
+  }, [familias, busca]);
+
+  const renameFamily = useRenameFamily((nome) => {
+    setEditingFamily(null);
+    setSelectedFamily((current) => (current ? { ...current, nome_lider: nome } : current));
+  });
+
+  const openEdit = (familia: { id: string; nome_lider: string }) => {
+    setEditingFamily(familia);
+    setNovoNomeFamilia(familia.nome_lider);
+  };
+
+  const handleRenameFamily = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingFamily && novoNomeFamilia.trim()) {
+      renameFamily.mutate({ id: editingFamily.id, nome: novoNomeFamilia });
+    }
+  };
 
   const createFamily = useMutation({
     mutationFn: async (nome: string) => {
@@ -57,6 +98,7 @@ const Index = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["familias"] });
+      queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
       setDialogOpen(false);
       setNomeLider("");
       toast.success("Família criada!");
@@ -78,6 +120,9 @@ const Index = () => {
             familiaId={selectedFamily.id}
             nomeLider={selectedFamily.nome_lider}
             onBack={() => setSelectedFamily(null)}
+            onRenamed={(nome) =>
+              setSelectedFamily((current) => (current ? { ...current, nome_lider: nome } : current))
+            }
           />
         </div>
       </div>
@@ -107,6 +152,17 @@ const Index = () => {
           </Button>
         </div>
 
+        {/* Busca tolerante: acha por apelido, acento ou nome de qualquer membro */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar família ou convidado..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
         {/* List */}
         {isLoading ? (
           <div className="space-y-3">
@@ -120,14 +176,21 @@ const Index = () => {
             <p className="text-lg font-medium">Nenhuma família cadastrada</p>
             <p className="text-sm mt-1">Comece adicionando a primeira família.</p>
           </div>
+        ) : familiasVisiveis.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground">
+            <Search className="h-10 w-10 mx-auto mb-3 opacity-30" />
+            <p className="text-lg font-medium">Nenhuma família encontrada</p>
+            <p className="text-sm mt-1">Tente outro nome ou o sobrenome.</p>
+          </div>
         ) : (
           <div className="space-y-3">
-            {familias.map((f) => (
+            {familiasVisiveis.map((f) => (
               <FamilyCard
                 key={f.id}
                 nomeLider={f.nome_lider}
                 totalConvidados={f.total}
                 onClick={() => setSelectedFamily({ id: f.id, nome_lider: f.nome_lider })}
+                onEdit={() => openEdit(f)}
               />
             ))}
           </div>
@@ -152,6 +215,41 @@ const Index = () => {
             <DialogFooter>
               <Button type="submit" disabled={!nomeLider.trim() || createFamily.isPending}>
                 Criar e adicionar convidados
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rename family dialog */}
+      <Dialog open={!!editingFamily} onOpenChange={(open) => !open && setEditingFamily(null)}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleRenameFamily}>
+            <DialogHeader>
+              <DialogTitle>Editar nome da família</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2 py-4">
+              <Input
+                placeholder="Nome do líder da família"
+                value={novoNomeFamilia}
+                onChange={(e) => setNovoNomeFamilia(e.target.value)}
+                autoFocus
+              />
+              <p className="text-xs text-muted-foreground">
+                Dica: escrever o nome completo com o apelido — “Beatriz (Bia) Miron” — faz a busca
+                encontrar o convite pelos dois.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setEditingFamily(null)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={!novoNomeFamilia.trim() || renameFamily.isPending}>
+                Salvar
               </Button>
             </DialogFooter>
           </form>

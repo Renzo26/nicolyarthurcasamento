@@ -4,16 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2, UserPlus } from "lucide-react";
+import { ArrowLeft, Check, Pencil, Plus, Trash2, UserPlus, X } from "lucide-react";
+import { useRenameFamily, useRenameGuest } from "@/hooks/use-family-mutations";
 
 interface GuestManagerProps {
   familiaId: string;
   nomeLider: string;
   onBack: () => void;
+  onRenamed: (nome: string) => void;
 }
 
-const GuestManager = ({ familiaId, nomeLider, onBack }: GuestManagerProps) => {
+const GuestManager = ({ familiaId, nomeLider, onBack, onRenamed }: GuestManagerProps) => {
   const [novoNome, setNovoNome] = useState("");
+  const [editandoFamilia, setEditandoFamilia] = useState(false);
+  const [nomeFamiliaDraft, setNomeFamiliaDraft] = useState(nomeLider);
+  const [editandoConvidadoId, setEditandoConvidadoId] = useState<string | null>(null);
+  const [nomeConvidadoDraft, setNomeConvidadoDraft] = useState("");
   const queryClient = useQueryClient();
 
   const { data: convidados = [], isLoading } = useQuery({
@@ -29,6 +35,13 @@ const GuestManager = ({ familiaId, nomeLider, onBack }: GuestManagerProps) => {
     },
   });
 
+  const renameFamily = useRenameFamily((nome) => {
+    setEditandoFamilia(false);
+    onRenamed(nome);
+  });
+
+  const renameGuest = useRenameGuest(familiaId);
+
   const addGuest = useMutation({
     mutationFn: async (nome: string) => {
       const { error } = await supabase
@@ -39,6 +52,7 @@ const GuestManager = ({ familiaId, nomeLider, onBack }: GuestManagerProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["convidados", familiaId] });
       queryClient.invalidateQueries({ queryKey: ["familias"] });
+      queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
       setNovoNome("");
       toast.success("Convidado adicionado!");
     },
@@ -53,6 +67,7 @@ const GuestManager = ({ familiaId, nomeLider, onBack }: GuestManagerProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["convidados", familiaId] });
       queryClient.invalidateQueries({ queryKey: ["familias"] });
+      queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
       toast.success("Convidado removido.");
     },
     onError: () => toast.error("Erro ao remover convidado."),
@@ -63,17 +78,83 @@ const GuestManager = ({ familiaId, nomeLider, onBack }: GuestManagerProps) => {
     if (novoNome.trim()) addGuest.mutate(novoNome);
   };
 
+  const startEditFamilia = () => {
+    setNomeFamiliaDraft(nomeLider);
+    setEditandoFamilia(true);
+  };
+
+  const handleRenameFamilia = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (nomeFamiliaDraft.trim()) renameFamily.mutate({ id: familiaId, nome: nomeFamiliaDraft });
+  };
+
+  const startEditConvidado = (id: string, nome: string) => {
+    setEditandoConvidadoId(id);
+    setNomeConvidadoDraft(nome);
+  };
+
+  const handleRenameConvidado = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editandoConvidadoId || !nomeConvidadoDraft.trim()) return;
+    renameGuest.mutate(
+      { id: editandoConvidadoId, nome: nomeConvidadoDraft },
+      { onSuccess: () => setEditandoConvidadoId(null) },
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div>
-          <h2 className="text-xl font-bold text-foreground">Família {nomeLider}</h2>
-          <p className="text-sm text-muted-foreground">
-            {convidados.length} {convidados.length === 1 ? "convidado" : "convidados"}
-          </p>
+        <div className="min-w-0 flex-1">
+          {editandoFamilia ? (
+            <form onSubmit={handleRenameFamilia} className="flex items-center gap-2">
+              <Input
+                value={nomeFamiliaDraft}
+                onChange={(e) => setNomeFamiliaDraft(e.target.value)}
+                placeholder="Nome da família"
+                aria-label="Nome da família"
+                autoFocus
+              />
+              <Button
+                type="submit"
+                size="icon"
+                disabled={!nomeFamiliaDraft.trim() || renameFamily.isPending}
+                aria-label="Salvar nome da família"
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => setEditandoFamilia(false)}
+                aria-label="Cancelar edição"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </form>
+          ) : (
+            <>
+              <div className="flex items-center gap-1">
+                <h2 className="truncate text-xl font-bold text-foreground">Família {nomeLider}</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={startEditFamilia}
+                  aria-label="Editar nome da família"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {convidados.length} {convidados.length === 1 ? "convidado" : "convidados"}
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -108,18 +189,60 @@ const GuestManager = ({ familiaId, nomeLider, onBack }: GuestManagerProps) => {
           {convidados.map((c) => (
             <li
               key={c.id}
-              className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-4 py-3"
+              className="flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-card px-4 py-3"
             >
-              <span className="text-card-foreground">{c.nome}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={() => removeGuest.mutate(c.id)}
-                disabled={removeGuest.isPending}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              {editandoConvidadoId === c.id ? (
+                <form onSubmit={handleRenameConvidado} className="flex flex-1 items-center gap-2">
+                  <Input
+                    value={nomeConvidadoDraft}
+                    onChange={(e) => setNomeConvidadoDraft(e.target.value)}
+                    aria-label={`Nome de ${c.nome}`}
+                    autoFocus
+                  />
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={!nomeConvidadoDraft.trim() || renameGuest.isPending}
+                    aria-label="Salvar nome"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setEditandoConvidadoId(null)}
+                    aria-label="Cancelar edição"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </form>
+              ) : (
+                <>
+                  <span className="truncate text-card-foreground">{c.nome}</span>
+                  <div className="flex shrink-0 items-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-foreground"
+                      onClick={() => startEditConvidado(c.id, c.nome)}
+                      aria-label={`Editar nome de ${c.nome}`}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => removeGuest.mutate(c.id)}
+                      disabled={removeGuest.isPending}
+                      aria-label={`Remover ${c.nome}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>

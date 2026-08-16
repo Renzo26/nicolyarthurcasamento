@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { bestScore, MATCH_THRESHOLD } from "@/lib/name-search";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,36 +27,38 @@ const RsvpSection = () => {
   const [selectedFamilyId, setSelectedFamilyId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: results = [], isLoading } = useQuery({
-    queryKey: ["rsvp-search", query],
-    enabled: query.trim().length >= 2,
+  // A lista inteira vem de uma vez (é pequena) porque o casamento de nomes é
+  // tolerante — apelido, acento e erro de digitação — e o `ilike` do Postgres
+  // só acha substring exata: quem foi cadastrado como "Bia" nunca apareceria
+  // numa busca por "Beatriz".
+  const { data: familias = [], isLoading: isLoadingList } = useQuery({
+    queryKey: ["rsvp-familias"],
+    staleTime: 60_000,
     queryFn: async () => {
-      const term = query.trim();
-      // Buscar em paralelo: por nome do líder da família e por nome do convidado
-      const [byGuest, byLider] = await Promise.all([
-        supabase.from("convidados").select("familia_id").ilike("nome", `%${term}%`),
-        supabase.from("familias").select("id").ilike("nome_lider", `%${term}%`),
-      ]);
-      if (byGuest.error) throw byGuest.error;
-      if (byLider.error) throw byLider.error;
-
-      const familyIds = Array.from(
-        new Set([
-          ...(byGuest.data ?? []).map((m) => m.familia_id),
-          ...(byLider.data ?? []).map((m) => m.id),
-        ]),
-      );
-      if (familyIds.length === 0) return [] as FamiliaResult[];
-
-      const { data: famData, error: famErr } = await supabase
+      const { data, error } = await supabase
         .from("familias")
         .select("id, nome_lider, convidados(id, nome, confirmado, familia_id)")
-        .in("id", familyIds)
         .order("nome_lider");
-      if (famErr) throw famErr;
-      return (famData ?? []) as unknown as FamiliaResult[];
+      if (error) throw error;
+      return (data ?? []) as unknown as FamiliaResult[];
     },
   });
+
+  const term = query.trim();
+  const isLoading = isLoadingList && term.length >= 2;
+
+  const results = useMemo(() => {
+    if (term.length < 2) return [] as FamiliaResult[];
+    return familias
+      .map((f) => ({
+        familia: f,
+        score: bestScore(term, [f.nome_lider, ...f.convidados.map((c) => c.nome)]),
+      }))
+      .filter((r) => r.score >= MATCH_THRESHOLD)
+      .sort((a, b) => b.score - a.score || a.familia.nome_lider.localeCompare(b.familia.nome_lider))
+      .slice(0, 8)
+      .map((r) => r.familia);
+  }, [familias, term]);
 
   const selectedFamily =
     results.find((f) => f.id === selectedFamilyId) ?? (results.length === 1 ? results[0] : null);
@@ -66,7 +69,7 @@ const RsvpSection = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["rsvp-search"] });
+      queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
     },
     onError: () => toast.error("Não foi possível atualizar agora."),
   });
@@ -79,7 +82,7 @@ const RsvpSection = () => {
     },
     onSuccess: () => {
       toast.success("Presença confirmada! 💛");
-      queryClient.invalidateQueries({ queryKey: ["rsvp-search"] });
+      queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
     },
     onError: () => toast.error("Erro ao confirmar."),
   });
@@ -94,7 +97,7 @@ const RsvpSection = () => {
     },
     onSuccess: () => {
       toast("Presença cancelada para a família.");
-      queryClient.invalidateQueries({ queryKey: ["rsvp-search"] });
+      queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
     },
     onError: () => toast.error("Erro ao cancelar."),
   });
@@ -144,9 +147,12 @@ const RsvpSection = () => {
         </div>
       )}
 
-      {!isLoading && query.length >= 2 && results.length === 0 && (
+      {!isLoading && term.length >= 2 && results.length === 0 && (
         <div className="text-center py-8 opacity-70 font-body text-sm">
-          Nenhum convite encontrado com esse nome.
+          <p>Nenhum convite encontrado com esse nome.</p>
+          <p className="mt-1 text-xs">
+            Tente o sobrenome ou o nome de outra pessoa do mesmo convite.
+          </p>
         </div>
       )}
 
