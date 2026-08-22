@@ -225,3 +225,21 @@ export const matchesName = (query: string, target: string): boolean =>
  */
 export const bestScore = (query: string, targets: string[]): number =>
   targets.reduce((best, t) => Math.max(best, nameScore(query, t)), 0);
+
+/** Mantém só os dígitos: "(11) 98888-7777" → "11988887777". */
+export const normalizePhone = (value: string): string => value.replace(/\D/g, "");
+
+/**
+ * Score de telefone (0 a 1). O convidado pode digitar com ou sem DDI, DDD ou
+ * o nono dígito — e esse nono dígito é inserido no meio do número (depois do
+ * DDD), não no início, então nem prefixo nem sufixo do número inteiro
+ * resolvem. Comparamos pelos últimos 8 dígitos, que são sempre a linha em
+ * si e não mudam com DDI/DDD/nono dígito.
+ */
+export const phoneScore = (query: string, target: string): number => {
+  const q = normalizePhone(query);
+  const t = normalizePhone(target);
+  if (q.length < 8 || t.length < 8) return 0;
+  if (q.slice(-8) !== t.slice(-8)) return 0;
+  return q === t ? 1 : 0.9;
+};

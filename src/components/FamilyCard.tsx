@@ -1,15 +1,16 @@
-import { Pencil, Users } from "lucide-react";
+import { Pencil, Phone, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 interface FamilyCardProps {
   nomeLider: string;
+  telefone: string | null;
   totalConvidados: number;
   onClick: () => void;
   onEdit: () => void;
 }
 
-const FamilyCard = ({ nomeLider, totalConvidados, onClick, onEdit }: FamilyCardProps) => {
+const FamilyCard = ({ nomeLider, telefone, totalConvidados, onClick, onEdit }: FamilyCardProps) => {
   return (
     <Card
       className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-border/60"
@@ -25,6 +26,12 @@ const FamilyCard = ({ nomeLider, totalConvidados, onClick, onEdit }: FamilyCardP
               <Users className="h-3.5 w-3.5" />
               {totalConvidados} {totalConvidados === 1 ? "convidado" : "convidados"}
             </p>
+            {telefone && (
+              <p className="text-muted-foreground text-sm flex items-center gap-1.5">
+                <Phone className="h-3.5 w-3.5" />
+                {telefone}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-1">
             {/* O clique no lápis não pode abrir a família — só renomear. */}

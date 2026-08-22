@@ -4,20 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { ArrowLeft, Check, Pencil, Plus, Trash2, UserPlus, X } from "lucide-react";
-import { useRenameFamily, useRenameGuest } from "@/hooks/use-family-mutations";
+import { ArrowLeft, Check, Pencil, Phone, Plus, Trash2, UserPlus, X } from "lucide-react";
+import { FamilyUpdate, useUpdateFamily, useRenameGuest } from "@/hooks/use-family-mutations";
 
 interface GuestManagerProps {
   familiaId: string;
   nomeLider: string;
+  telefone: string | null;
   onBack: () => void;
-  onRenamed: (nome: string) => void;
+  onUpdated: (familia: FamilyUpdate) => void;
 }
 
-const GuestManager = ({ familiaId, nomeLider, onBack, onRenamed }: GuestManagerProps) => {
+const GuestManager = ({ familiaId, nomeLider, telefone, onBack, onUpdated }: GuestManagerProps) => {
   const [novoNome, setNovoNome] = useState("");
   const [editandoFamilia, setEditandoFamilia] = useState(false);
   const [nomeFamiliaDraft, setNomeFamiliaDraft] = useState(nomeLider);
+  const [telefoneFamiliaDraft, setTelefoneFamiliaDraft] = useState(telefone ?? "");
   const [editandoConvidadoId, setEditandoConvidadoId] = useState<string | null>(null);
   const [nomeConvidadoDraft, setNomeConvidadoDraft] = useState("");
   const queryClient = useQueryClient();
@@ -35,9 +37,9 @@ const GuestManager = ({ familiaId, nomeLider, onBack, onRenamed }: GuestManagerP
     },
   });
 
-  const renameFamily = useRenameFamily((nome) => {
+  const updateFamily = useUpdateFamily((familia) => {
     setEditandoFamilia(false);
-    onRenamed(nome);
+    onUpdated(familia);
   });
 
   const renameGuest = useRenameGuest(familiaId);
@@ -80,12 +82,18 @@ const GuestManager = ({ familiaId, nomeLider, onBack, onRenamed }: GuestManagerP
 
   const startEditFamilia = () => {
     setNomeFamiliaDraft(nomeLider);
+    setTelefoneFamiliaDraft(telefone ?? "");
     setEditandoFamilia(true);
   };
 
   const handleRenameFamilia = (e: React.FormEvent) => {
     e.preventDefault();
-    if (nomeFamiliaDraft.trim()) renameFamily.mutate({ id: familiaId, nome: nomeFamiliaDraft });
+    if (nomeFamiliaDraft.trim())
+      updateFamily.mutate({
+        id: familiaId,
+        nome: nomeFamiliaDraft,
+        telefone: telefoneFamiliaDraft,
+      });
   };
 
   const startEditConvidado = (id: string, nome: string) => {
@@ -110,31 +118,40 @@ const GuestManager = ({ familiaId, nomeLider, onBack, onRenamed }: GuestManagerP
         </Button>
         <div className="min-w-0 flex-1">
           {editandoFamilia ? (
-            <form onSubmit={handleRenameFamilia} className="flex items-center gap-2">
+            <form onSubmit={handleRenameFamilia} className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Input
+                  value={nomeFamiliaDraft}
+                  onChange={(e) => setNomeFamiliaDraft(e.target.value)}
+                  placeholder="Nome da família"
+                  aria-label="Nome da família"
+                  autoFocus
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  disabled={!nomeFamiliaDraft.trim() || updateFamily.isPending}
+                  aria-label="Salvar dados da família"
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setEditandoFamilia(false)}
+                  aria-label="Cancelar edição"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
               <Input
-                value={nomeFamiliaDraft}
-                onChange={(e) => setNomeFamiliaDraft(e.target.value)}
-                placeholder="Nome da família"
-                aria-label="Nome da família"
-                autoFocus
+                value={telefoneFamiliaDraft}
+                onChange={(e) => setTelefoneFamiliaDraft(e.target.value)}
+                placeholder="Telefone (opcional)"
+                aria-label="Telefone da família"
+                type="tel"
               />
-              <Button
-                type="submit"
-                size="icon"
-                disabled={!nomeFamiliaDraft.trim() || renameFamily.isPending}
-                aria-label="Salvar nome da família"
-              >
-                <Check className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditandoFamilia(false)}
-                aria-label="Cancelar edição"
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </form>
           ) : (
             <>
@@ -144,7 +161,7 @@ const GuestManager = ({ familiaId, nomeLider, onBack, onRenamed }: GuestManagerP
                   variant="ghost"
                   size="icon"
                   onClick={startEditFamilia}
-                  aria-label="Editar nome da família"
+                  aria-label="Editar nome e telefone da família"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <Pencil className="h-4 w-4" />
@@ -153,6 +170,12 @@ const GuestManager = ({ familiaId, nomeLider, onBack, onRenamed }: GuestManagerP
               <p className="text-sm text-muted-foreground">
                 {convidados.length} {convidados.length === 1 ? "convidado" : "convidados"}
               </p>
+              {telefone && (
+                <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                  <Phone className="h-3.5 w-3.5" />
+                  {telefone}
+                </p>
+              )}
             </>
           )}
         </div>

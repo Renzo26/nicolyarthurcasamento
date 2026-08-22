@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { matchesName, nameScore, normalize, tokenize, bestScore } from "./name-search";
+import {
+  matchesName,
+  nameScore,
+  normalize,
+  tokenize,
+  bestScore,
+  normalizePhone,
+  phoneScore,
+} from "./name-search";
 
 describe("normalize / tokenize", () => {
   it("remove acentos, pontuação e caixa", () => {
@@ -66,5 +74,35 @@ describe("ranking", () => {
     const familia = ["Carlos Miron", "Bia Miron", "Pedro Miron"];
     expect(bestScore("beatriz", familia)).toBeGreaterThanOrEqual(0.6);
     expect(bestScore("mariana", familia)).toBeLessThan(0.6);
+  });
+});
+
+describe("normalizePhone / phoneScore", () => {
+  it("mantém só os dígitos", () => {
+    expect(normalizePhone("(11) 98888-7777")).toBe("11988887777");
+  });
+
+  it("casa o número exato", () => {
+    expect(phoneScore("11988887777", "11988887777")).toBe(1);
+  });
+
+  it("casa mesmo com formatação diferente", () => {
+    expect(phoneScore("(11) 98888-7777", "11988887777")).toBe(1);
+  });
+
+  it("casa sem o DDI quando o cadastro tem +55", () => {
+    expect(phoneScore("11988887777", "+55 11 98888-7777")).toBeGreaterThan(0);
+  });
+
+  it("casa sem o nono dígito", () => {
+    expect(phoneScore("1188887777", "11988887777")).toBeGreaterThan(0);
+  });
+
+  it("não casa números diferentes", () => {
+    expect(phoneScore("11988887777", "11977776666")).toBe(0);
+  });
+
+  it("ignora termos curtos demais para serem telefone", () => {
+    expect(phoneScore("123", "11988887777")).toBe(0);
   });
 });

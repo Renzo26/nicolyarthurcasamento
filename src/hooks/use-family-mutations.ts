@@ -2,30 +2,44 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+export interface FamilyUpdate {
+  nome_lider: string;
+  telefone: string | null;
+}
+
 /**
- * Renomeia a família (nome do líder). Usado tanto na lista quanto dentro da
- * família, por isso vive aqui e não no componente.
+ * Atualiza o nome do líder e/ou o telefone da família. Usado tanto na lista
+ * quanto dentro da família, por isso vive aqui e não no componente.
  */
-export const useRenameFamily = (onRenamed?: (nome: string) => void) => {
+export const useUpdateFamily = (onUpdated?: (familia: FamilyUpdate) => void) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, nome }: { id: string; nome: string }) => {
+    mutationFn: async ({
+      id,
+      nome,
+      telefone,
+    }: {
+      id: string;
+      nome: string;
+      telefone?: string;
+    }) => {
       const nomeLimpo = nome.trim();
+      const telefoneLimpo = telefone?.trim() || null;
       const { error } = await supabase
         .from("familias")
-        .update({ nome_lider: nomeLimpo })
+        .update({ nome_lider: nomeLimpo, telefone: telefoneLimpo })
         .eq("id", id);
       if (error) throw error;
-      return nomeLimpo;
+      return { nome_lider: nomeLimpo, telefone: telefoneLimpo };
     },
-    onSuccess: (nomeLimpo) => {
+    onSuccess: (familia) => {
       queryClient.invalidateQueries({ queryKey: ["familias"] });
       queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
-      toast.success("Nome da família atualizado!");
-      onRenamed?.(nomeLimpo);
+      toast.success("Família atualizada!");
+      onUpdated?.(familia);
     },
-    onError: () => toast.error("Erro ao renomear a família."),
+    onError: () => toast.error("Erro ao atualizar a família."),
   });
 };
 

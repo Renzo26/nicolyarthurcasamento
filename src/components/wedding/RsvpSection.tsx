@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { bestScore, MATCH_THRESHOLD } from "@/lib/name-search";
+import { bestScore, MATCH_THRESHOLD, phoneScore } from "@/lib/name-search";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,6 +18,7 @@ interface Convidado {
 interface FamiliaResult {
   id: string;
   nome_lider: string;
+  telefone: string | null;
   convidados: Convidado[];
 }
 
@@ -37,7 +38,7 @@ const RsvpSection = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("familias")
-        .select("id, nome_lider, convidados(id, nome, confirmado, familia_id)")
+        .select("id, nome_lider, telefone, convidados(id, nome, confirmado, familia_id)")
         .order("nome_lider");
       if (error) throw error;
       return (data ?? []) as unknown as FamiliaResult[];
@@ -52,7 +53,12 @@ const RsvpSection = () => {
     return familias
       .map((f) => ({
         familia: f,
-        score: bestScore(term, [f.nome_lider, ...f.convidados.map((c) => c.nome)]),
+        // Aceita tanto nome (do líder ou de qualquer convidado) quanto o
+        // telefone cadastrado para a família.
+        score: Math.max(
+          bestScore(term, [f.nome_lider, ...f.convidados.map((c) => c.nome)]),
+          phoneScore(term, f.telefone ?? ""),
+        ),
       }))
       .filter((r) => r.score >= MATCH_THRESHOLD)
       .sort((a, b) => b.score - a.score || a.familia.nome_lider.localeCompare(b.familia.nome_lider))
@@ -117,7 +123,7 @@ const RsvpSection = () => {
             style={{ color: "hsl(var(--wedding-gold))" }}
           />
           <Input
-            placeholder="Buscar por nome..."
+            placeholder="Buscar por nome ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-16 rounded-xl pl-14 font-display text-lg text-[hsl(var(--wedding-cream))] placeholder:text-[hsl(var(--wedding-cream))]/45 focus-visible:ring-[hsl(var(--wedding-gold))]"
@@ -149,9 +155,9 @@ const RsvpSection = () => {
 
       {!isLoading && term.length >= 2 && results.length === 0 && (
         <div className="text-center py-8 opacity-70 font-body text-sm">
-          <p>Nenhum convite encontrado com esse nome.</p>
+          <p>Nenhum convite encontrado.</p>
           <p className="mt-1 text-xs">
-            Tente o sobrenome ou o nome de outra pessoa do mesmo convite.
+            Tente o sobrenome, o telefone ou o nome de outra pessoa do mesmo convite.
           </p>
         </div>
       )}
