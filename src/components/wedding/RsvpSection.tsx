@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { bestScore, MATCH_THRESHOLD, phoneScore } from "@/lib/name-search";
+import { MATCH_THRESHOLD, normalizePhone, phoneScore } from "@/lib/name-search";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,25 +46,18 @@ const RsvpSection = () => {
   });
 
   const term = query.trim();
-  const isLoading = isLoadingList && term.length >= 2;
+  const termDigits = normalizePhone(term);
+  const isLoading = isLoadingList && termDigits.length >= 8;
 
   const results = useMemo(() => {
-    if (term.length < 2) return [] as FamiliaResult[];
+    if (termDigits.length < 8) return [] as FamiliaResult[];
     return familias
-      .map((f) => ({
-        familia: f,
-        // Aceita tanto nome (do líder ou de qualquer convidado) quanto o
-        // telefone cadastrado para a família.
-        score: Math.max(
-          bestScore(term, [f.nome_lider, ...f.convidados.map((c) => c.nome)]),
-          phoneScore(term, f.telefone ?? ""),
-        ),
-      }))
+      .map((f) => ({ familia: f, score: phoneScore(termDigits, f.telefone ?? "") }))
       .filter((r) => r.score >= MATCH_THRESHOLD)
       .sort((a, b) => b.score - a.score || a.familia.nome_lider.localeCompare(b.familia.nome_lider))
       .slice(0, 8)
       .map((r) => r.familia);
-  }, [familias, term]);
+  }, [familias, termDigits]);
 
   const selectedFamily =
     results.find((f) => f.id === selectedFamilyId) ?? (results.length === 1 ? results[0] : null);
@@ -123,9 +116,11 @@ const RsvpSection = () => {
             style={{ color: "hsl(var(--wedding-gold))" }}
           />
           <Input
-            placeholder="Buscar por nome ou telefone..."
+            placeholder="Buscar pelo telefone cadastrado..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            type="tel"
+            inputMode="numeric"
             className="h-16 rounded-xl pl-14 font-display text-lg text-[hsl(var(--wedding-cream))] placeholder:text-[hsl(var(--wedding-cream))]/45 focus-visible:ring-[hsl(var(--wedding-gold))]"
             style={{
               background: "hsl(var(--wedding-night) / 0.65)",
@@ -135,7 +130,7 @@ const RsvpSection = () => {
         </div>
         <Button
           type="submit"
-          disabled={search.trim().length < 2}
+          disabled={normalizePhone(search).length < 8}
           className="h-16 rounded-xl px-10 font-display font-semibold text-sm uppercase tracking-[0.28em] transition-transform hover:scale-[1.02] hover:opacity-100"
           style={{
             background: "linear-gradient(180deg, hsl(42 52% 82%) 0%, hsl(38 40% 62%) 100%)",
@@ -153,12 +148,10 @@ const RsvpSection = () => {
         </div>
       )}
 
-      {!isLoading && term.length >= 2 && results.length === 0 && (
+      {!isLoading && termDigits.length >= 8 && results.length === 0 && (
         <div className="text-center py-8 opacity-70 font-body text-sm">
           <p>Nenhum convite encontrado.</p>
-          <p className="mt-1 text-xs">
-            Tente o sobrenome, o telefone ou o nome de outra pessoa do mesmo convite.
-          </p>
+          <p className="mt-1 text-xs">Confira o telefone cadastrado com quem organizou o convite.</p>
         </div>
       )}
 
