@@ -118,7 +118,7 @@ const RsvpSection = () => {
           <Input
             placeholder="Buscar pelo telefone cadastrado..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value.replace(/\D/g, ""))}
             type="tel"
             inputMode="numeric"
             className="h-16 rounded-xl pl-14 font-display text-lg text-[hsl(var(--wedding-cream))] placeholder:text-[hsl(var(--wedding-cream))]/45 focus-visible:ring-[hsl(var(--wedding-gold))]"
