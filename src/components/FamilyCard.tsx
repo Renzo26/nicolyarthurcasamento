@@ -1,16 +1,24 @@
-import { Pencil, Phone, Users } from "lucide-react";
+import { Armchair, Pencil, Phone, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 interface FamilyCardProps {
   nomeLider: string;
   telefone: string | null;
+  numeroMesa: string | null;
   totalConvidados: number;
   onClick: () => void;
   onEdit: () => void;
 }
 
-const FamilyCard = ({ nomeLider, telefone, totalConvidados, onClick, onEdit }: FamilyCardProps) => {
+const FamilyCard = ({
+  nomeLider,
+  telefone,
+  numeroMesa,
+  totalConvidados,
+  onClick,
+  onEdit,
+}: FamilyCardProps) => {
   return (
     <Card
       className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-border/60"
@@ -30,6 +38,12 @@ const FamilyCard = ({ nomeLider, telefone, totalConvidados, onClick, onEdit }: F
               <p className="text-muted-foreground text-sm flex items-center gap-1.5">
                 <Phone className="h-3.5 w-3.5" />
                 {telefone}
+              </p>
+            )}
+            {numeroMesa && (
+              <p className="text-muted-foreground text-sm flex items-center gap-1.5">
+                <Armchair className="h-3.5 w-3.5" />
+                Mesa {numeroMesa}
               </p>
             )}
           </div>

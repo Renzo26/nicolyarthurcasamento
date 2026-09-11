@@ -4,22 +4,31 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { ArrowLeft, Check, Pencil, Phone, Plus, Trash2, UserPlus, X } from "lucide-react";
+import { Armchair, ArrowLeft, Check, Pencil, Phone, Plus, Trash2, UserPlus, X } from "lucide-react";
 import { FamilyUpdate, useUpdateFamily, useRenameGuest } from "@/hooks/use-family-mutations";
 
 interface GuestManagerProps {
   familiaId: string;
   nomeLider: string;
   telefone: string | null;
+  numeroMesa: string | null;
   onBack: () => void;
   onUpdated: (familia: FamilyUpdate) => void;
 }
 
-const GuestManager = ({ familiaId, nomeLider, telefone, onBack, onUpdated }: GuestManagerProps) => {
+const GuestManager = ({
+  familiaId,
+  nomeLider,
+  telefone,
+  numeroMesa,
+  onBack,
+  onUpdated,
+}: GuestManagerProps) => {
   const [novoNome, setNovoNome] = useState("");
   const [editandoFamilia, setEditandoFamilia] = useState(false);
   const [nomeFamiliaDraft, setNomeFamiliaDraft] = useState(nomeLider);
   const [telefoneFamiliaDraft, setTelefoneFamiliaDraft] = useState(telefone ?? "");
+  const [numeroMesaFamiliaDraft, setNumeroMesaFamiliaDraft] = useState(numeroMesa ?? "");
   const [editandoConvidadoId, setEditandoConvidadoId] = useState<string | null>(null);
   const [nomeConvidadoDraft, setNomeConvidadoDraft] = useState("");
   const queryClient = useQueryClient();
@@ -83,6 +92,7 @@ const GuestManager = ({ familiaId, nomeLider, telefone, onBack, onUpdated }: Gue
   const startEditFamilia = () => {
     setNomeFamiliaDraft(nomeLider);
     setTelefoneFamiliaDraft(telefone ?? "");
+    setNumeroMesaFamiliaDraft(numeroMesa ?? "");
     setEditandoFamilia(true);
   };
 
@@ -93,6 +103,7 @@ const GuestManager = ({ familiaId, nomeLider, telefone, onBack, onUpdated }: Gue
         id: familiaId,
         nome: nomeFamiliaDraft,
         telefone: telefoneFamiliaDraft,
+        numeroMesa: numeroMesaFamiliaDraft,
       });
   };
 
@@ -152,6 +163,12 @@ const GuestManager = ({ familiaId, nomeLider, telefone, onBack, onUpdated }: Gue
                 aria-label="Telefone da família"
                 type="tel"
               />
+              <Input
+                value={numeroMesaFamiliaDraft}
+                onChange={(e) => setNumeroMesaFamiliaDraft(e.target.value)}
+                placeholder="Número da mesa (opcional)"
+                aria-label="Número da mesa da família"
+              />
             </form>
           ) : (
             <>
@@ -161,7 +178,7 @@ const GuestManager = ({ familiaId, nomeLider, telefone, onBack, onUpdated }: Gue
                   variant="ghost"
                   size="icon"
                   onClick={startEditFamilia}
-                  aria-label="Editar nome e telefone da família"
+                  aria-label="Editar nome, telefone e mesa da família"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <Pencil className="h-4 w-4" />
@@ -174,6 +191,12 @@ const GuestManager = ({ familiaId, nomeLider, telefone, onBack, onUpdated }: Gue
                 <p className="text-sm text-muted-foreground flex items-center gap-1.5">
                   <Phone className="h-3.5 w-3.5" />
                   {telefone}
+                </p>
+              )}
+              {numeroMesa && (
+                <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                  <Armchair className="h-3.5 w-3.5" />
+                  Mesa {numeroMesa}
                 </p>
               )}
             </>

@@ -352,7 +352,7 @@ const Convite = () => {
           <Flourish className="mt-5" />
 
           <p className="mx-auto mt-8 max-w-lg font-display text-lg leading-relaxed opacity-90 lg:text-xl">
-            Digite o nome do responsável pela família ou de qualquer convidado para encontrar seu
+            Digite o número de celular do responsável pela família para encontrar seu
             convite.
           </p>
 

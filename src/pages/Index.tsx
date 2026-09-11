@@ -21,6 +21,7 @@ interface FamiliaWithCount {
   id: string;
   nome_lider: string;
   telefone: string | null;
+  numero_mesa: string | null;
   total: number;
   nomes: string[];
 }
@@ -29,18 +30,22 @@ const Index = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [nomeLider, setNomeLider] = useState("");
   const [telefoneLider, setTelefoneLider] = useState("");
+  const [numeroMesaLider, setNumeroMesaLider] = useState("");
   const [editingFamily, setEditingFamily] = useState<{
     id: string;
     nome_lider: string;
     telefone: string | null;
+    numero_mesa: string | null;
   } | null>(null);
   const [novoNomeFamilia, setNovoNomeFamilia] = useState("");
   const [novoTelefoneFamilia, setNovoTelefoneFamilia] = useState("");
+  const [novoNumeroMesaFamilia, setNovoNumeroMesaFamilia] = useState("");
   const [busca, setBusca] = useState("");
   const [selectedFamily, setSelectedFamily] = useState<{
     id: string;
     nome_lider: string;
     telefone: string | null;
+    numero_mesa: string | null;
   } | null>(null);
   const queryClient = useQueryClient();
 
@@ -49,7 +54,7 @@ const Index = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("familias")
-        .select("id, nome_lider, telefone, convidados(id, nome)")
+        .select("id, nome_lider, telefone, numero_mesa, convidados(id, nome)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []).map((f) => {
@@ -58,6 +63,7 @@ const Index = () => {
           id: f.id,
           nome_lider: f.nome_lider,
           telefone: f.telefone,
+          numero_mesa: f.numero_mesa,
           total: convidados.length,
           nomes: convidados.map((c) => c.nome),
         };
@@ -84,10 +90,16 @@ const Index = () => {
     setSelectedFamily((current) => (current ? { ...current, ...familia } : current));
   });
 
-  const openEdit = (familia: { id: string; nome_lider: string; telefone: string | null }) => {
+  const openEdit = (familia: {
+    id: string;
+    nome_lider: string;
+    telefone: string | null;
+    numero_mesa: string | null;
+  }) => {
     setEditingFamily(familia);
     setNovoNomeFamilia(familia.nome_lider);
     setNovoTelefoneFamilia(familia.telefone ?? "");
+    setNovoNumeroMesaFamilia(familia.numero_mesa ?? "");
   };
 
   const handleRenameFamily = (e: React.FormEvent) => {
@@ -97,15 +109,28 @@ const Index = () => {
         id: editingFamily.id,
         nome: novoNomeFamilia,
         telefone: novoTelefoneFamilia,
+        numeroMesa: novoNumeroMesaFamilia,
       });
     }
   };
 
   const createFamily = useMutation({
-    mutationFn: async ({ nome, telefone }: { nome: string; telefone: string }) => {
+    mutationFn: async ({
+      nome,
+      telefone,
+      numeroMesa,
+    }: {
+      nome: string;
+      telefone: string;
+      numeroMesa: string;
+    }) => {
       const { data, error } = await supabase
         .from("familias")
-        .insert({ nome_lider: nome.trim(), telefone: telefone.trim() || null })
+        .insert({
+          nome_lider: nome.trim(),
+          telefone: telefone.trim() || null,
+          numero_mesa: numeroMesa.trim() || null,
+        })
         .select()
         .single();
       if (error) throw error;
@@ -117,15 +142,22 @@ const Index = () => {
       setDialogOpen(false);
       setNomeLider("");
       setTelefoneLider("");
+      setNumeroMesaLider("");
       toast.success("Família criada!");
-      setSelectedFamily({ id: data.id, nome_lider: data.nome_lider, telefone: data.telefone });
+      setSelectedFamily({
+        id: data.id,
+        nome_lider: data.nome_lider,
+        telefone: data.telefone,
+        numero_mesa: data.numero_mesa,
+      });
     },
     onError: () => toast.error("Erro ao criar família."),
   });
 
   const handleCreateFamily = (e: React.FormEvent) => {
     e.preventDefault();
-    if (nomeLider.trim()) createFamily.mutate({ nome: nomeLider, telefone: telefoneLider });
+    if (nomeLider.trim())
+      createFamily.mutate({ nome: nomeLider, telefone: telefoneLider, numeroMesa: numeroMesaLider });
   };
 
   if (selectedFamily) {
@@ -136,6 +168,7 @@ const Index = () => {
             familiaId={selectedFamily.id}
             nomeLider={selectedFamily.nome_lider}
             telefone={selectedFamily.telefone}
+            numeroMesa={selectedFamily.numero_mesa}
             onBack={() => setSelectedFamily(null)}
             onUpdated={(familia) =>
               setSelectedFamily((current) => (current ? { ...current, ...familia } : current))
@@ -206,9 +239,15 @@ const Index = () => {
                 key={f.id}
                 nomeLider={f.nome_lider}
                 telefone={f.telefone}
+                numeroMesa={f.numero_mesa}
                 totalConvidados={f.total}
                 onClick={() =>
-                  setSelectedFamily({ id: f.id, nome_lider: f.nome_lider, telefone: f.telefone })
+                  setSelectedFamily({
+                    id: f.id,
+                    nome_lider: f.nome_lider,
+                    telefone: f.telefone,
+                    numero_mesa: f.numero_mesa,
+                  })
                 }
                 onEdit={() => openEdit(f)}
               />
@@ -236,6 +275,11 @@ const Index = () => {
                 value={telefoneLider}
                 onChange={(e) => setTelefoneLider(e.target.value)}
                 type="tel"
+              />
+              <Input
+                placeholder="Número da mesa (opcional)"
+                value={numeroMesaLider}
+                onChange={(e) => setNumeroMesaLider(e.target.value)}
               />
             </div>
             <DialogFooter>
@@ -266,6 +310,11 @@ const Index = () => {
                 value={novoTelefoneFamilia}
                 onChange={(e) => setNovoTelefoneFamilia(e.target.value)}
                 type="tel"
+              />
+              <Input
+                placeholder="Número da mesa (opcional)"
+                value={novoNumeroMesaFamilia}
+                onChange={(e) => setNovoNumeroMesaFamilia(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
                 Dica: escrever o nome completo com o apelido — “Beatriz (Bia) Miron” — faz a busca

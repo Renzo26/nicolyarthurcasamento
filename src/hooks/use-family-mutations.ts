@@ -5,11 +5,13 @@ import { toast } from "sonner";
 export interface FamilyUpdate {
   nome_lider: string;
   telefone: string | null;
+  numero_mesa: string | null;
 }
 
 /**
- * Atualiza o nome do líder e/ou o telefone da família. Usado tanto na lista
- * quanto dentro da família, por isso vive aqui e não no componente.
+ * Atualiza o nome do líder, telefone e/ou número da mesa da família. Usado
+ * tanto na lista quanto dentro da família, por isso vive aqui e não no
+ * componente.
  */
 export const useUpdateFamily = (onUpdated?: (familia: FamilyUpdate) => void) => {
   const queryClient = useQueryClient();
@@ -19,19 +21,22 @@ export const useUpdateFamily = (onUpdated?: (familia: FamilyUpdate) => void) => 
       id,
       nome,
       telefone,
+      numeroMesa,
     }: {
       id: string;
       nome: string;
       telefone?: string;
+      numeroMesa?: string;
     }) => {
       const nomeLimpo = nome.trim();
       const telefoneLimpo = telefone?.trim() || null;
+      const numeroMesaLimpo = numeroMesa?.trim() || null;
       const { error } = await supabase
         .from("familias")
-        .update({ nome_lider: nomeLimpo, telefone: telefoneLimpo })
+        .update({ nome_lider: nomeLimpo, telefone: telefoneLimpo, numero_mesa: numeroMesaLimpo })
         .eq("id", id);
       if (error) throw error;
-      return { nome_lider: nomeLimpo, telefone: telefoneLimpo };
+      return { nome_lider: nomeLimpo, telefone: telefoneLimpo, numero_mesa: numeroMesaLimpo };
     },
     onSuccess: (familia) => {
       queryClient.invalidateQueries({ queryKey: ["familias"] });

@@ -116,7 +116,7 @@ const RsvpSection = () => {
             style={{ color: "hsl(var(--wedding-gold))" }}
           />
           <Input
-            placeholder="Buscar pelo telefone cadastrado..."
+            placeholder="Buscar por telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value.replace(/\D/g, ""))}
             type="tel"
