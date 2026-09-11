@@ -8,6 +8,7 @@ import AdminGate from "@/components/AdminGate";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Convite from "./pages/Convite.tsx";
+import Portaria from "./pages/Portaria.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,15 @@ const App = () => (
               element={
                 <AdminGate>
                   <Index />
+                </AdminGate>
+              }
+            />
+            {/* Leitor de QR da entrada da festa: mesma senha do painel. */}
+            <Route
+              path="/portaria-nicolyarthur"
+              element={
+                <AdminGate>
+                  <Portaria />
                 </AdminGate>
               }
             />

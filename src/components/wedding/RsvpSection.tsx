@@ -22,6 +22,22 @@ interface FamiliaResult {
   convidados: Convidado[];
 }
 
+// Fluxo do n8n que manda no WhatsApp da família os confirmados, a mesa e o
+// QR code de entrada. Ele busca os dados no Supabase pelo id — o site não
+// envia telefone nem texto, então o webhook não serve para mandar mensagem
+// arbitrária.
+const CONFIRMACAO_WEBHOOK_URL = "https://n8n.cloudysolutions.fun/webhook/casamento-confirmacao";
+
+const avisarConfirmacao = (familiaId: string) =>
+  fetch(CONFIRMACAO_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ familia_id: familiaId }),
+    keepalive: true,
+  }).catch(() => {
+    // O WhatsApp é um extra: se falhar, a presença já está gravada.
+  });
+
 const RsvpSection = () => {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
@@ -75,12 +91,16 @@ const RsvpSection = () => {
 
   // Age só sobre quem está marcado — o rótulo do botão promete isso.
   const confirmSelected = useMutation({
-    mutationFn: async (ids: string[]) => {
+    mutationFn: async ({ familiaId, ids }: { familiaId: string; ids: string[] }) => {
       const { error } = await supabase.from("convidados").update({ confirmado: true }).in("id", ids);
       if (error) throw error;
+      return familiaId;
     },
-    onSuccess: () => {
-      toast.success("Presença confirmada! 💛");
+    onSuccess: (familiaId) => {
+      avisarConfirmacao(familiaId);
+      toast.success("Presença confirmada! 💛", {
+        description: "Você vai receber a confirmação e o QR code de entrada no WhatsApp.",
+      });
       queryClient.invalidateQueries({ queryKey: ["rsvp-familias"] });
     },
     onError: () => toast.error("Erro ao confirmar."),
@@ -234,9 +254,10 @@ const RsvpSection = () => {
           <div className="flex flex-col sm:flex-row gap-2 pt-2">
             <Button
               onClick={() =>
-                confirmSelected.mutate(
-                  selectedFamily.convidados.filter((c) => c.confirmado).map((c) => c.id),
-                )
+                confirmSelected.mutate({
+                  familiaId: selectedFamily.id,
+                  ids: selectedFamily.convidados.filter((c) => c.confirmado).map((c) => c.id),
+                })
               }
               disabled={
                 confirmSelected.isPending || !selectedFamily.convidados.some((c) => c.confirmado)

@@ -51,6 +51,7 @@ export type Database = {
       }
       familias: {
         Row: {
+          checkin_em: string | null
           created_at: string
           id: string
           nome_lider: string
@@ -58,6 +59,7 @@ export type Database = {
           telefone: string | null
         }
         Insert: {
+          checkin_em?: string | null
           created_at?: string
           id?: string
           nome_lider: string
@@ -65,6 +67,7 @@ export type Database = {
           telefone?: string | null
         }
         Update: {
+          checkin_em?: string | null
           created_at?: string
           id?: string
           nome_lider?: string
